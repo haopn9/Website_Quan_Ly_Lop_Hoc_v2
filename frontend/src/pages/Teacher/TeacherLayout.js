@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet, Link } from 'react-router-dom';
-import { FaChalkboard, FaSignOutAlt } from 'react-icons/fa';
+import { FaChalkboard, FaUsers, FaSignOutAlt } from 'react-icons/fa';
 import './TeacherLayout.css';
 
 const TeacherLayout = () => {
@@ -22,6 +22,11 @@ const TeacherLayout = () => {
           <li>
             <Link to="/teacher/classes" className="menu-item">
               <FaChalkboard className="menu-icon" /> <span>Quản lý Lớp học</span>
+            </Link>
+          </li>
+          <li>
+            <Link to="/teacher/manage-groups" className="menu-item">
+              <FaUsers className="menu-icon" /> <span>Quản lý Nhóm</span>
             </Link>
           </li>
           <li>
