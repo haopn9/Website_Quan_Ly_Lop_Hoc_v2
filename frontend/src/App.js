@@ -18,6 +18,10 @@ import ClassManagement from './pages/Admin/ClassManagement';
 import GroupManagement from './pages/Admin/GroupManagement';
 import MessageManagement from './pages/Admin/MessageManagement';
 
+// Import Layout và các trang của TEACHER
+import TeacherLayout from './pages/Teacher/TeacherLayout';
+import TeacherManageClasses from './pages/Teacher/ManageClasses/ManageClasses';
+
 
 function App() {
   return (
@@ -28,7 +32,13 @@ function App() {
         {/* Tuyến đường trang đăng nhập */}
         <Route path="/login" element={<LoginPage />} />
 
-                   {/* Tuyến đường Admin */}
+        {/* Tuyến đường Teacher */}
+        <Route path="/teacher" element={<TeacherLayout />}>
+          <Route index element={<TeacherManageClasses />} />
+          <Route path="classes" element={<TeacherManageClasses />} />
+        </Route>
+
+        {/* Tuyến đường Admin */}
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<Dashboard />} />
           <Route path="dashboard" element={<Dashboard />} />

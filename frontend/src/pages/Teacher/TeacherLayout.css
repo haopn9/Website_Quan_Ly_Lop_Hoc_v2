@@ -1,0 +1,103 @@
+.teacher-layout-container {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f4f7fe;
+  overflow: hidden;
+}
+
+/* --- SIDEBAR --- */
+.sidebar {
+  width: 280px;
+  background-color: #152259;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+/* Khu vực Avatar */
+.sidebar-profile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 10px;
+}
+
+.avatar-circle {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  margin-bottom: 15px;
+  border: 3px solid #fff;
+}
+
+.avatar-circle img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.user-name {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+.user-code { 
+  font-size: 13px; 
+  color: #b0b5c9; 
+  margin-top: 5px; 
+}
+
+/* Khu vực Menu */
+.sidebar-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  padding: 15px 30px;
+  color: #b0b5c9;
+  text-decoration: none;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.menu-item:hover {
+  color: white;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-left: 4px solid #fff;
+}
+
+.menu-item.active {
+  color: white;
+  background-color: rgba(255, 255, 255, 0.08);
+  border-left: 4px solid #4fc3f7;
+}
+
+.menu-icon {
+  margin-right: 15px;
+  font-size: 18px;
+}
+
+/* --- MAIN CONTENT --- */
+.teacher-main-content {
+  flex: 1;
+  background-color: #ffffff; 
+  padding: 30px;
+  overflow-y: auto;
+}
