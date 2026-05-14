@@ -1,0 +1,260 @@
+/* Dashboard.css - Trang tổng quan */
+
+/* Header Gradient - Giống GroupManagement */
+.dashboard-header-gradient {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 20px;
+  padding: 28px 32px;
+  margin-bottom: 28px;
+  color: white;
+}
+
+.dashboard-header-gradient h2 {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.dashboard-header-gradient p {
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+/* Stats Cards */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+  margin-bottom: 32px;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 20px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s;
+  border: 1px solid #eef2f6;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.stat-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+}
+
+.stat-icon.blue { background: #e0e7ff; color: #4f46e5; }
+.stat-icon.green { background: #dcfce7; color: #16a34a; }
+.stat-icon.orange { background: #fed7aa; color: #ea580c; }
+.stat-icon.purple { background: #f3e8ff; color: #9333ea; }
+.stat-icon.info { background: #dbeafe; color: #2563eb; }
+.stat-icon.warning { background: #fef3c7; color: #d97706; }
+.stat-icon.danger { background: #fee2e2; color: #dc2626; }
+
+.stat-info h3 {
+  font-size: 13px;
+  font-weight: 500;
+  color: #64748b;
+  margin-bottom: 8px;
+}
+
+.stat-number {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 8px;
+}
+
+.stat-change {
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.stat-change.positive { color: #16a34a; }
+.stat-change.negative { color: #dc2626; }
+
+/* Classes Grid */
+.classes-grid-modern {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+/* Class Card - Giống Group Card */
+.class-card-modern {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s;
+  overflow: hidden;
+  border: 1px solid #eef2f6;
+}
+
+.class-card-modern:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+}
+
+.class-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 20px;
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  border-bottom: 1px solid #eef2f6;
+}
+
+.class-title h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 6px;
+}
+
+.class-code {
+  display: inline-block;
+  padding: 4px 10px;
+  background: #e0e7ff;
+  color: #4f46e5;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.class-card-body {
+  padding: 20px;
+}
+
+.class-info-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: #475569;
+}
+
+.info-icon {
+  color: #94a3b8;
+  font-size: 14px;
+  width: 18px;
+}
+
+.class-stats-modern {
+  display: flex;
+  gap: 20px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #eef2f6;
+}
+
+.class-stats-modern .stat-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #64748b;
+}
+
+.class-stats-modern .stat-icon {
+  font-size: 14px;
+  color: #667eea;
+}
+
+.class-card-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 16px 20px;
+  background: #f8fafc;
+  border-top: 1px solid #eef2f6;
+}
+
+/* Action Buttons */
+.action-btn {
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: none;
+  font-size: 13px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+
+.action-btn.view {
+  background: #e0e7ff;
+  color: #4f46e5;
+}
+
+.action-btn.edit {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.action-btn.delete {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.action-btn:hover {
+  transform: scale(1.02);
+}
+
+/* View All Button */
+.view-all-container {
+  text-align: center;
+  margin-top: 24px;
+}
+
+.btn-view-all {
+  display: inline-block;
+  padding: 12px 28px;
+  background: white;
+  border: 1px solid #667eea;
+  border-radius: 12px;
+  color: #667eea;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
+.btn-view-all:hover {
+  background: #667eea;
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  .classes-grid-modern {
+    grid-template-columns: 1fr;
+  }
+  .dashboard-header-gradient {
+    padding: 20px;
+  }
+  .dashboard-header-gradient h2 {
+    font-size: 20px;
+  }
+}
