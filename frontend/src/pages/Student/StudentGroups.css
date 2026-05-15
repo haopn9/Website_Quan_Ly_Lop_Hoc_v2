@@ -1,0 +1,581 @@
+/* ============================================================
+   StudentGroups.css
+   ============================================================ */
+
+.sg-container {
+  padding: 24px;
+  background: #f4f7fe;
+  min-height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* HEADER */
+.sg-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.sg-top h1 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #152259;
+}
+
+.sg-btn-outline {
+  background: #fff;
+  color: #152259;
+  border: 1.5px solid #152259;
+  border-radius: 10px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.sg-btn-outline:hover {
+  background: #f0f4ff;
+}
+
+/* TAB BAR */
+.sg-tab-bar {
+  display: flex;
+  gap: 4px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 4px;
+  border: 0.5px solid #e8eaf0;
+  margin-bottom: 20px;
+  width: fit-content;
+}
+
+.sg-tab {
+  padding: 8px 20px;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #888;
+  border: none;
+  background: none;
+  transition: background 0.2s, color 0.2s;
+}
+
+.sg-tab:hover {
+  color: #152259;
+}
+
+.sg-tab.active {
+  background: #152259;
+  color: #fff;
+}
+
+/* ============================================================
+   DROPDOWN CHỌN NHÓM
+   ============================================================ */
+.group-selector-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  background: #fff;
+  padding: 12px 20px;
+  border-radius: 12px;
+  border: 0.5px solid #e8eaf0;
+}
+
+.group-selector-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #aaa;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.group-select {
+  flex: 1;
+  max-width: 420px;
+  border: 1.5px solid #e0e5f0;
+  border-radius: 9px;
+  padding: 9px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #152259;
+  background: #f4f7fe;
+  outline: none;
+  cursor: pointer;
+  font-family: 'Segoe UI', sans-serif;
+  transition: border-color 0.2s;
+}
+
+.group-select:focus {
+  border-color: #378add;
+}
+
+/* ============================================================
+   CARD CHUNG
+   ============================================================ */
+.sg-card {
+  background: #fff;
+  border-radius: 16px;
+  border: 0.5px solid #e8eaf0;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.sg-card-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #152259;
+  margin-bottom: 4px;
+}
+
+.sg-card-sub {
+  font-size: 12px;
+  color: #aaa;
+  margin-bottom: 16px;
+}
+
+/* ============================================================
+   THÔNG TIN NHÓM
+   ============================================================ */
+.sg-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 9px 0;
+  border-bottom: 0.5px solid #f0f2f8;
+  font-size: 13px;
+}
+
+.sg-info-row:last-child {
+  border-bottom: none;
+}
+
+.sg-info-row span:first-child {
+  color: #aaa;
+  font-size: 12px;
+  min-width: 120px;
+}
+
+.sg-info-row span:last-child {
+  font-weight: 600;
+  color: #152259;
+  text-align: right;
+  flex: 1;
+  max-width: 200px;
+  line-height: 1.4;
+}
+
+.sg-progress-wrap {
+  margin-top: 16px;
+}
+
+.sg-progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #aaa;
+  margin-bottom: 6px;
+}
+
+.sg-progress-label strong {
+  color: #152259;
+  font-weight: 700;
+}
+
+.sg-pbar {
+  background: #f0f2f8;
+  border-radius: 6px;
+  height: 7px;
+  overflow: hidden;
+}
+
+.sg-pfill {
+  height: 100%;
+  border-radius: 6px;
+  background: #378add;
+  transition: width .5s;
+}
+
+/* ============================================================
+   THỐNG KÊ NHIỆM VỤ
+   ============================================================ */
+.sg-stat-mini {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.sg-smc {
+  background: #f4f7fe;
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+}
+
+.sg-smc-val {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.sg-smc-lbl {
+  font-size: 11px;
+  color: #aaa;
+  margin-top: 4px;
+}
+
+.sg-task-bar-row {
+  margin-bottom: 9px;
+}
+
+.sg-task-bar-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #aaa;
+  margin-bottom: 4px;
+}
+
+/* 2 cột */
+.sg-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+/* ============================================================
+   THÀNH VIÊN NHÓM
+   ============================================================ */
+.sg-section-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #888;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.sg-member-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 0;
+  border-bottom: 0.5px solid #f0f2f8;
+}
+
+.sg-member-row:last-child {
+  border-bottom: none;
+}
+
+.sg-av {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.sg-mname {
+  font-size: 13px;
+  font-weight: 600;
+  color: #152259;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.sg-msub {
+  font-size: 11px;
+  color: #aaa;
+  margin-top: 2px;
+}
+
+.sg-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 9px;
+  border-radius: 20px;
+}
+
+.sg-badge-me {
+  font-size: 10px;
+  background: #eaf3de;
+  color: #3b6d11;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.sg-mini-bar-wrap {
+  text-align: right;
+  min-width: 90px;
+}
+
+.sg-mini-bar-label {
+  font-size: 11px;
+  color: #aaa;
+  margin-bottom: 3px;
+}
+
+.sg-mini-pbar {
+  width: 80px;
+  background: #f0f2f8;
+  border-radius: 6px;
+  height: 5px;
+  overflow: hidden;
+  margin-left: auto;
+}
+
+.sg-mini-pfill {
+  height: 100%;
+  border-radius: 6px;
+}
+
+/* ============================================================
+   LỊCH SỬ YÊU CẦU
+   ============================================================ */
+.sg-semester-select-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.sg-semester-select-wrap label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #888;
+  white-space: nowrap;
+}
+
+.sg-semester-select {
+  border: 1.5px solid #e0e5f0;
+  border-radius: 9px;
+  padding: 7px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #152259;
+  background: #fff;
+  outline: none;
+  cursor: pointer;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.sg-semester-select:focus {
+  border-color: #378add;
+}
+
+.sg-req-card {
+  background: #fff;
+  border-radius: 14px;
+  border: 0.5px solid #e8eaf0;
+  padding: 16px 20px;
+  margin-bottom: 10px;
+}
+
+.sg-req-card:last-child {
+  margin-bottom: 0;
+}
+
+.sg-req-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.sg-req-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #152259;
+}
+
+.sg-req-meta {
+  font-size: 11px;
+  color: #aaa;
+  margin-top: 3px;
+}
+
+.sg-req-reason {
+  font-size: 12px;
+  color: #555;
+  background: #f4f7fe;
+  padding: 9px 12px;
+  border-radius: 9px;
+  line-height: 1.6;
+}
+
+.sg-gv-reply {
+  color: #a32d2d;
+  font-size: 11px;
+  margin-top: 6px;
+  display: block;
+}
+
+/* ============================================================
+   MODAL YÊU CẦU CHUYỂN NHÓM
+   ============================================================ */
+.sg-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: sgFade 0.2s ease;
+}
+
+@keyframes sgFade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.sg-modal-content {
+  background: #fff;
+  width: 90%;
+  max-width: 480px;
+  border-radius: 16px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.14);
+  overflow: hidden;
+  animation: sgSlide 0.25s ease;
+}
+
+@keyframes sgSlide {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.sg-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 22px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.sg-modal-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #152259;
+}
+
+.sg-close-btn {
+  background: none;
+  border: none;
+  font-size: 17px;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 3px 7px;
+  border-radius: 6px;
+  transition: color 0.2s, background 0.2s;
+}
+
+.sg-close-btn:hover {
+  color: #e24b4a;
+  background: #fef2f2;
+}
+
+.sg-modal-form {
+  padding: 20px 22px;
+}
+
+.sg-form-group {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.sg-form-group label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #475569;
+  margin-bottom: 6px;
+}
+
+.sg-input {
+  padding: 10px 13px;
+  border: 1.5px solid #e0e5f0;
+  border-radius: 9px;
+  font-size: 13px;
+  color: #152259;
+  outline: none;
+  font-family: 'Segoe UI', sans-serif;
+  transition: border-color 0.2s;
+}
+
+.sg-input:focus {
+  border-color: #378add;
+}
+
+.sg-input:disabled {
+  background: #f1f5f9;
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+.sg-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 22px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.sg-btn-cancel {
+  padding: 9px 20px;
+  background: #fff;
+  border: 1.5px solid #dde3f0;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.sg-btn-cancel:hover {
+  background: #f8fafc;
+}
+
+.sg-btn-save {
+  padding: 9px 20px;
+  background: #152259;
+  border: none;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.sg-btn-save:hover {
+  background: #1e3280;
+}

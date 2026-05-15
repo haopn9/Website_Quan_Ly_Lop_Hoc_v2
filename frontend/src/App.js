@@ -23,6 +23,15 @@ import TeacherLayout from './pages/Teacher/TeacherLayout';
 import TeacherManageClasses from './pages/Teacher/ManageClasses/ManageClasses';
 import TeacherManageGroups from './pages/Teacher/ManageGroups/ManageGroups';
 
+// Import Layout và các trang của STUDENT
+import StudentLayout from './pages/Student/StudentLayout';
+import StudentDashboard from './pages/Student/StudentDashboard';
+import StudentClasses from './pages/Student/StudentClasses';
+import StudentClassDetail from './pages/Student/StudentClassDetail';
+import StudentGroups from './pages/Student/StudentGroups';
+import StudentTasks from './pages/Student/StudentTasks';
+import StudentChat from './pages/Student/StudentChat';
+import StudentManageGroup from './pages/Student/StudentManageGroup';
 
 function App() {
   return (
@@ -49,6 +58,19 @@ function App() {
           <Route path="groups" element={<GroupManagement />} />
           <Route path="messages" element={<MessageManagement />} /> 
           <Route path="profile" element={<UserProfile role="admin" />} />
+        </Route>
+
+        {/* Tuyến đường Student */}
+        <Route path="/student" element={<StudentLayout />}>
+          <Route index element={<StudentDashboard />} />
+          <Route path="dashboard" element={<StudentDashboard />} />
+          <Route path="profile" element={<UserProfile role="student" />} />
+          <Route path="classes" element={<StudentClasses />} />
+          <Route path="classes/:classId" element={<StudentClassDetail />} />
+          <Route path="groups" element={<StudentGroups />} />
+          <Route path="tasks" element={<StudentTasks />} />
+          <Route path="chat" element={<StudentChat />} />
+          <Route path="manage-group" element={<StudentManageGroup />} />
         </Route>
 
 
