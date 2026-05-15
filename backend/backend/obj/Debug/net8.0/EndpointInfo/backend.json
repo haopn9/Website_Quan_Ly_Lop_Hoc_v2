@@ -5,6 +5,723 @@
     "version": "1.0"
   },
   "paths": {
+    "/api/DeTai": {
+      "get": {
+        "tags": [
+          "DeTai"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "DeTai"
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "TenDeTai": {
+                    "type": "string"
+                  },
+                  "MoTa": {
+                    "type": "string"
+                  },
+                  "SanPhamKyVong": {
+                    "type": "string"
+                  },
+                  "MaLop": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "NgayBatDau": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "NgayKetThuc": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "PhuongThucGiao": {
+                    "type": "string"
+                  }
+                }
+              },
+              "encoding": {
+                "TenDeTai": {
+                  "style": "form"
+                },
+                "MoTa": {
+                  "style": "form"
+                },
+                "SanPhamKyVong": {
+                  "style": "form"
+                },
+                "MaLop": {
+                  "style": "form"
+                },
+                "NgayBatDau": {
+                  "style": "form"
+                },
+                "NgayKetThuc": {
+                  "style": "form"
+                },
+                "PhuongThucGiao": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/DeTai/{id}": {
+      "get": {
+        "tags": [
+          "DeTai"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "DeTai"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeTaiUpdateDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeTaiUpdateDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeTaiUpdateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "DeTai"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/DeTai/lop/{maLop}": {
+      "get": {
+        "tags": [
+          "DeTai"
+        ],
+        "parameters": [
+          {
+            "name": "maLop",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/DeTai/cap-nhat-giao": {
+      "post": {
+        "tags": [
+          "DeTai"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GiaoDeTaiDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GiaoDeTaiDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/GiaoDeTaiDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/DeTai/dang-ky": {
+      "post": {
+        "tags": [
+          "DeTai"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DangKyDeTaiDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DangKyDeTaiDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/DangKyDeTaiDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/DiemSo": {
+      "get": {
+        "tags": [
+          "DiemSo"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "DiemSo"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DiemSoDTOs"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DiemSoDTOs"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/DiemSoDTOs"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/DiemSo/chi-tiet/{id}": {
+      "get": {
+        "tags": [
+          "DiemSo"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/DiemSo/{id}": {
+      "get": {
+        "tags": [
+          "DiemSo"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "DiemSo"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DiemSoDTOs"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DiemSoDTOs"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/DiemSoDTOs"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "DiemSo"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/DiemSo/by-lop/{maLop}": {
+      "get": {
+        "tags": [
+          "DiemSo"
+        ],
+        "parameters": [
+          {
+            "name": "maLop",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/LopHoc/{maLop}/sinhvien-chua-co-nhom": {
+      "get": {
+        "tags": [
+          "LopHoc"
+        ],
+        "parameters": [
+          {
+            "name": "maLop",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/LopHoc/cua-toi": {
+      "get": {
+        "tags": [
+          "LopHoc"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/LopHoc/tham-gia": {
+      "post": {
+        "tags": [
+          "LopHoc"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ThamGiaLopDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ThamGiaLopDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ThamGiaLopDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/LopHoc": {
+      "get": {
+        "tags": [
+          "LopHoc"
+        ],
+        "parameters": [
+          {
+            "name": "maHocKy",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "LopHoc"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaoLopDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaoLopDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaoLopDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/LopHoc/{id}": {
+      "get": {
+        "tags": [
+          "LopHoc"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "LopHoc"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CapNhatLopDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CapNhatLopDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CapNhatLopDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "LopHoc"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/LopHoc/giangvien": {
+      "get": {
+        "tags": [
+          "LopHoc"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/LopHoc/hocky": {
+      "get": {
+        "tags": [
+          "LopHoc"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/LopHoc/{maLop}/sinhvien/{maSinhVien}": {
+      "delete": {
+        "tags": [
+          "LopHoc"
+        ],
+        "parameters": [
+          {
+            "name": "maLop",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "maSinhVien",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/LopHoc/{maLop}/chot-nhom": {
+      "put": {
+        "tags": [
+          "LopHoc"
+        ],
+        "parameters": [
+          {
+            "name": "maLop",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChotNhomDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChotNhomDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChotNhomDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/NguoiDung": {
       "get": {
         "tags": [
@@ -203,10 +920,357 @@
           }
         }
       }
+    },
+    "/api/Nhom/cua-toi": {
+      "get": {
+        "tags": [
+          "Nhom"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Nhom": {
+      "get": {
+        "tags": [
+          "Nhom"
+        ],
+        "parameters": [
+          {
+            "name": "maLop",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Nhom"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaoNhomDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaoNhomDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaoNhomDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Nhom/{maNhom}": {
+      "get": {
+        "tags": [
+          "Nhom"
+        ],
+        "parameters": [
+          {
+            "name": "maNhom",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Nhom"
+        ],
+        "parameters": [
+          {
+            "name": "maNhom",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Nhom/{maNhom}/themthanhvien": {
+      "post": {
+        "tags": [
+          "Nhom"
+        ],
+        "parameters": [
+          {
+            "name": "maNhom",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ThemThanhVienDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ThemThanhVienDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ThemThanhVienDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Nhom/{maNhom}/xoathanhvien/{maSinhVien}": {
+      "delete": {
+        "tags": [
+          "Nhom"
+        ],
+        "parameters": [
+          {
+            "name": "maNhom",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "maSinhVien",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Nhom/{maNhom}/roinhom": {
+      "delete": {
+        "tags": [
+          "Nhom"
+        ],
+        "parameters": [
+          {
+            "name": "maNhom",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Nhom/{maNhom}/nhomtruong": {
+      "put": {
+        "tags": [
+          "Nhom"
+        ],
+        "parameters": [
+          {
+            "name": "maNhom",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DatNhomTruongDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DatNhomTruongDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/DatNhomTruongDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Nhom/{maNhom}/detai": {
+      "post": {
+        "tags": [
+          "Nhom"
+        ],
+        "parameters": [
+          {
+            "name": "maNhom",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ThemDeTaiDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ThemDeTaiDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ThemDeTaiDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Nhom/phan-nhom-ngau-nhien": {
+      "post": {
+        "tags": [
+          "Nhom"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PhanNhomNgauNhienDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PhanNhomNgauNhienDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PhanNhomNgauNhienDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "CapNhatLopDto": {
+        "type": "object",
+        "properties": {
+          "tenLop": {
+            "type": "string",
+            "nullable": true
+          },
+          "maHocKy": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ngayBatDau": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "ngayKetThuc": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "thoiGianHoc": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "CapNhatNguoiDungDto": {
         "type": "object",
         "properties": {
@@ -260,6 +1324,121 @@
         },
         "additionalProperties": false
       },
+      "ChotNhomDto": {
+        "type": "object",
+        "properties": {
+          "trangThaiChot": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "DangKyDeTaiDto": {
+        "type": "object",
+        "properties": {
+          "maDeTai": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "maLop": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "DatNhomTruongDto": {
+        "type": "object",
+        "properties": {
+          "maSinhVien": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "DeTaiUpdateDto": {
+        "type": "object",
+        "properties": {
+          "tenDeTai": {
+            "type": "string",
+            "nullable": true
+          },
+          "moTa": {
+            "type": "string",
+            "nullable": true
+          },
+          "sanPhamKyVong": {
+            "type": "string",
+            "nullable": true
+          },
+          "ngayBatDau": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "ngayKetThuc": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "DiemSoDTOs": {
+        "type": "object",
+        "properties": {
+          "maDiem": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "maSinhVien": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "tenSinhVien": {
+            "type": "string",
+            "nullable": true
+          },
+          "maNhom": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "maLop": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "diemNhom": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "diemCaNhan": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "nhanXet": {
+            "type": "string",
+            "nullable": true
+          },
+          "maGiangVien": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "tenGiangVien": {
+            "type": "string",
+            "nullable": true
+          },
+          "ngayCham": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "DoiMatKhauDto": {
         "type": "object",
         "properties": {
@@ -269,6 +1448,119 @@
           },
           "matKhauMoi": {
             "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GiaoDeTaiDto": {
+        "type": "object",
+        "properties": {
+          "maDeTai": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "maNhom": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "phuongThucGiao": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PhanNhomNgauNhienDto": {
+        "type": "object",
+        "properties": {
+          "maLop": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TaoLopDto": {
+        "type": "object",
+        "properties": {
+          "tenLop": {
+            "type": "string",
+            "nullable": true
+          },
+          "maHocKy": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ngayBatDau": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "ngayKetThuc": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "thoiGianHoc": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "TaoNhomDto": {
+        "type": "object",
+        "properties": {
+          "tenNhom": {
+            "type": "string",
+            "nullable": true
+          },
+          "maLop": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "soThanhVienToiDa": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ThamGiaLopDto": {
+        "type": "object",
+        "properties": {
+          "maLopHoc": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ThemDeTaiDto": {
+        "type": "object",
+        "properties": {
+          "tenDeTai": {
+            "type": "string",
+            "nullable": true
+          },
+          "moTa": {
+            "type": "string",
+            "nullable": true
+          },
+          "sanPhamKyVong": {
+            "type": "string",
+            "nullable": true
+          },
+          "ngayBatDau": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "ngayKetThuc": {
+            "type": "string",
+            "format": "date-time",
             "nullable": true
           }
         },
@@ -317,6 +1609,16 @@
           "lopSinhVien": {
             "type": "string",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ThemThanhVienDto": {
+        "type": "object",
+        "properties": {
+          "maSinhVien": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false
