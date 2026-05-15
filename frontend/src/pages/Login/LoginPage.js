@@ -97,7 +97,7 @@ const LoginPage = () => {
       if (username === 'admin') {
         navigate('/admin/dashboard');
       } else if (username === 'teacher') {
-        navigate('/teacher/dashboard');
+        navigate('/teacher/classes');
       } else if (username === 'student') {
         navigate('/student/dashboard');
       } else {
