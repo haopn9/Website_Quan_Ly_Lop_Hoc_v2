@@ -23,6 +23,7 @@ import TeacherLayout from './pages/Teacher/TeacherLayout';
 import TeacherManageClasses from './pages/Teacher/ManageClasses/ManageClasses';
 import TeacherManageGroups from './pages/Teacher/ManageGroups/ManageGroups';
 import TeacherManageTopics from './pages/Teacher/ManageTopics/ManageTopics';
+import TeacherTracking from './pages/Teacher/Tracking/Tracking';
 
 // Import Layout và các trang của STUDENT
 import StudentLayout from './pages/Student/StudentLayout';
@@ -49,6 +50,7 @@ function App() {
           <Route path="classes" element={<TeacherManageClasses />} />
           <Route path="manage-groups" element={<TeacherManageGroups />} />
           <Route path="manage-topics" element={<TeacherManageTopics />} />
+          <Route path="tracking" element={<TeacherTracking />} />
         </Route>
 
         {/* Tuyến đường Admin */}
