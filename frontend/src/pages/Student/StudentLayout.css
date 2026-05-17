@@ -1,0 +1,133 @@
+.student-layout-container {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f4f7fe;
+  overflow: hidden;
+}
+
+/* --- KHUNG XANH (SIDEBAR) --- */
+.sidebar {
+  width: 280px;
+  background-color: #152259; /* Màu xanh đen giống thiết kế */
+  color: white;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto; /* Cho phép cuộn nếu menu quá dài */
+}
+
+/* Khu vực Avatar */
+.sidebar-profile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 10px;
+}
+
+.avatar-circle {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  margin-bottom: 15px;
+  border: 3px solid #fff;
+}
+
+.avatar-circle img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.user-name {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+.user-code { 
+  font-size: 13px; 
+  color: #b0b5c9; 
+  margin-top: 5px; 
+}
+
+/* Khu vực Menu */
+.sidebar-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  padding: 15px 30px;
+  color: #b0b5c9; /* Màu chữ mờ */
+  text-decoration: none;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.menu-item:hover {
+  color: white;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-left: 4px solid #fff; /* Hiệu ứng gạch trắng bên trái */
+}
+
+.menu-icon {
+  margin-right: 15px;
+  font-size: 18px;
+}
+
+.dropdown-icon {
+  margin-left: auto;
+  font-size: 12px;
+}
+
+/* Thư mục con (Sub-menu) */
+.sub-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  background-color: #0d1640; /* Nền tối hơn sidebar một chút */
+}
+
+.sub-menu li a {
+  display: block;
+  padding: 12px 30px 12px 65px; /* Thụt lề vào sâu hơn */
+  color: #b0b5c9;
+  text-decoration: none;
+  font-size: 14px;
+  transition: 0.3s;
+}
+
+.sub-menu li a:hover {
+  color: white;
+}
+
+.badge-new {
+  margin-left: auto;
+  background-color: #bbdefb;
+  color: #152259;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 3px 8px;
+  border-radius: 12px;
+}
+
+/* --- KHUNG TRẮNG (MAIN CONTENT) --- */
+.main-content {
+  flex: 1; /* Tự động chiếm hết diện tích còn lại */
+  background-color: #ffffff; 
+  padding: 30px;
+  overflow-y: auto;
+}
