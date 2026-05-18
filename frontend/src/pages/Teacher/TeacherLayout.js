@@ -1,9 +1,28 @@
-import React from 'react';
-import { Outlet, Link } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { FaChalkboard, FaUsers, FaBook, FaSignOutAlt, FaChartLine } from 'react-icons/fa';
 import './TeacherLayout.css';
+import authService from '../../services/authService';
 
 const TeacherLayout = () => {
+  const navigate = useNavigate();
+  const currentUser = authService.getCurrentUser();
+
+  useEffect(() => {
+    if (!currentUser || currentUser.maVaiTro !== 2) {
+      // Nếu chưa đăng nhập hoặc không phải giảng viên, đẩy về trang login
+      navigate('/login');
+    }
+  }, [currentUser, navigate]);
+
+  const handleLogout = (e) => {
+    e.preventDefault();
+    authService.logout();
+    navigate('/login');
+  };
+
+  // Nếu đang loading để redirect
+  if (!currentUser) return null;
   return (
     <div className="teacher-layout-container">
       <aside className="sidebar">
@@ -11,10 +30,10 @@ const TeacherLayout = () => {
         {/* Avatar Giảng viên */}
         <div className="sidebar-profile">
           <div className="avatar-circle">
-            <img src="https://i.pravatar.cc/150?img=3" alt="Teacher Avatar" />
+            <img src={currentUser.anhDaiDien || "https://i.pravatar.cc/150?img=3"} alt="Teacher Avatar" />
           </div>
-          <h3 className="user-name">Thầy Minh Khang</h3>
-          <p className="user-code">GV00123</p>
+          <h3 className="user-name">{currentUser.hoTen}</h3>
+          <p className="user-code">{currentUser.maSo || currentUser.tenDangNhap}</p>
         </div>
 
         {/* Menu Giảng viên - chỉ giữ lại chức năng đã hoàn thiện */}
@@ -40,9 +59,9 @@ const TeacherLayout = () => {
             </Link>
           </li>
           <li>
-            <Link to="/login" className="menu-item">
+            <a href="#" className="menu-item" onClick={handleLogout}>
               <FaSignOutAlt className="menu-icon" /> <span>Đăng xuất</span>
-            </Link>
+            </a>
           </li>
         </ul>
       </aside>
