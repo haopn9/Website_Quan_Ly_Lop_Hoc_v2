@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import './ManageTopics.css';
-import { FaSearch, FaPlus, FaBook, FaEdit, FaTrash, FaCheckCircle } from 'react-icons/fa';
+import { FaSearch, FaPlus, FaBook, FaEdit, FaTrash, FaCheckCircle, FaUserCheck, FaTimes } from 'react-icons/fa';
 import detaiService from '../../../services/deTaiService';
 import classService from '../../../services/classService';
+import nhomService from '../../../services/nhomService';
+import apiClient from '../../../services/apiClient';
 
 const ManageTopics = () => {
   const [classes, setClasses] = useState([]);
@@ -11,6 +13,9 @@ const ManageTopics = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [newTopic, setNewTopic] = useState({ tenDeTai: '', ngayBatDau: '', ngayKetThuc: '' });
   const [editingTopicId, setEditingTopicId] = useState(null);
+  const [groupsInClass, setGroupsInClass] = useState([]);
+  const [assigningTopicId, setAssigningTopicId] = useState(null);
+  const [selectedGroupForAssign, setSelectedGroupForAssign] = useState('');
 
   // Fetch classes
   useEffect(() => {
@@ -45,8 +50,19 @@ const ManageTopics = () => {
   useEffect(() => {
     if (filterClass) {
       fetchTopics(filterClass);
+      // Fetch groups in class for assign feature
+      const fetchGroups = async () => {
+        try {
+          const data = await nhomService.getGroupsByClass(filterClass);
+          setGroupsInClass(data);
+        } catch (e) {
+          setGroupsInClass([]);
+        }
+      };
+      fetchGroups();
     } else {
       setTopics([]);
+      setGroupsInClass([]);
     }
   }, [filterClass]);
 
@@ -118,6 +134,41 @@ const ManageTopics = () => {
           alert(error.message || 'Lỗi khi xóa đề tài');
         }
       }
+    }
+  };
+
+  const handleAssignTopic = async (topic) => {
+    if (!selectedGroupForAssign) {
+      alert('Vui lòng chọn nhóm để giao đề tài.');
+      return;
+    }
+    try {
+      await apiClient.post('/api/detai/cap-nhat-giao', {
+        maDeTai: topic.maDeTai,
+        maNhom: parseInt(selectedGroupForAssign),
+        phuongThucGiao: 'Chỉ định trực tiếp'
+      });
+      alert('Đã giao đề tài cho nhóm thành công!');
+      setAssigningTopicId(null);
+      setSelectedGroupForAssign('');
+      fetchTopics(filterClass);
+    } catch (error) {
+      alert(error.message || 'Lỗi khi giao đề tài');
+    }
+  };
+
+  const handleUnassignTopic = async (topic) => {
+    if (!window.confirm(`Bạn có chắc muốn gỡ nhóm "${topic.tenNhom}" khỏi đề tài này?`)) return;
+    try {
+      await apiClient.post('/api/detai/cap-nhat-giao', {
+        maDeTai: topic.maDeTai,
+        maNhom: 0,
+        phuongThucGiao: 'Đăng ký tự do'
+      });
+      alert('Đã gỡ nhóm khỏi đề tài.');
+      fetchTopics(filterClass);
+    } catch (error) {
+      alert(error.message || 'Lỗi khi gỡ nhóm');
     }
   };
 
@@ -198,6 +249,15 @@ const ManageTopics = () => {
                       <span className={`topic-status topic-status-${statusClass}`}>
                         {status}
                       </span>
+                      {!topic.daCoNhom ? (
+                        <button className="btn-icon" title="Giao cho nhóm" style={{color: '#0ea5e9'}} onClick={() => { setAssigningTopicId(assigningTopicId === topic.maDeTai ? null : topic.maDeTai); setSelectedGroupForAssign(''); }}>
+                          <FaUserCheck />
+                        </button>
+                      ) : (
+                        <button className="btn-icon" title="Gỡ nhóm" style={{color: '#f97316'}} onClick={() => handleUnassignTopic(topic)}>
+                          <FaTimes />
+                        </button>
+                      )}
                       <button className="btn-icon edit" title="Sửa đề tài" onClick={() => handleEditClick(topic)}>
                         <FaEdit />
                       </button>
@@ -205,6 +265,36 @@ const ManageTopics = () => {
                         <FaTrash />
                       </button>
                     </div>
+
+                    {/* Dropdown chọn nhóm */}
+                    {assigningTopicId === topic.maDeTai && (
+                      <div style={{marginTop: '10px', padding: '10px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0'}}>
+                        <div style={{display: 'flex', gap: '8px', alignItems: 'center'}}>
+                          <select
+                            value={selectedGroupForAssign}
+                            onChange={(e) => setSelectedGroupForAssign(e.target.value)}
+                            style={{flex: 1, padding: '6px 10px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '13px'}}
+                          >
+                            <option value="">-- Chọn nhóm --</option>
+                            {groupsInClass.map(g => (
+                              <option key={g.maNhom} value={g.maNhom}>{g.tenNhom} ({g.soThanhVienHienTai}/{g.soThanhVienToiDa} SV)</option>
+                            ))}
+                          </select>
+                          <button
+                            onClick={() => handleAssignTopic(topic)}
+                            style={{padding: '6px 14px', background: '#0ea5e9', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', whiteSpace: 'nowrap'}}
+                          >
+                            Giao
+                          </button>
+                          <button
+                            onClick={() => setAssigningTopicId(null)}
+                            style={{padding: '6px 10px', background: '#e2e8f0', color: '#475569', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '13px'}}
+                          >
+                            Hủy
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 );
               })
