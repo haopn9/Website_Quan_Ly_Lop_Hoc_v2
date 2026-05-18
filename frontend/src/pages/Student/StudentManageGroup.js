@@ -2,11 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaTimes, FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import './StudentManageGroup.css';
-import deTaiService from '../../services/detaiService';
+import deTaiService from '../../services/deTaiService';
 import authService from '../../services/authService';
 import nhiemVuService from '../../services/nhiemVuService';
 import apiClient from '../../services/apiClient';
-
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5186';
 
 const buildFileUrl = (path) => {
@@ -439,24 +438,24 @@ function CreateTaskModal({ group, onClose, onRefresh }) {
           <div className="smg-modal-body">
             <div className="smg-form-group">
               <label>Tên nhiệm vụ <span className="req">*</span></label>
-              <input 
-                className="smg-input" 
-                placeholder="Ví dụ: Thiết kế giao diện Dashboard..." 
-                value={tenNhiemVu} 
-                onChange={e => setTenNhiemVu(e.target.value)} 
-                required 
+              <input
+                className="smg-input"
+                placeholder="Ví dụ: Thiết kế giao diện Dashboard..."
+                value={tenNhiemVu}
+                onChange={e => setTenNhiemVu(e.target.value)}
+                required
               />
             </div>
 
             <div className="modal-grid">
               <div className="smg-form-group">
                 <label>Hạn hoàn thành <span className="req">*</span></label>
-                <input 
-                  type="date" 
-                  className="smg-input" 
-                  value={hanHoanThanh} 
-                  onChange={e => setHanHoanThanh(e.target.value)} 
-                  required 
+                <input
+                  type="date"
+                  className="smg-input"
+                  value={hanHoanThanh}
+                  onChange={e => setHanHoanThanh(e.target.value)}
+                  required
                 />
               </div>
               <div className="smg-form-group">
@@ -472,7 +471,7 @@ function CreateTaskModal({ group, onClose, onRefresh }) {
             <div className="smg-form-group">
               <label>Giao cho thành viên</label>
               <div className="member-selection-grid">
-                <div 
+                <div
                   className={`ms-item ${assignees.length === 0 ? 'active' : ''}`}
                   onClick={() => setAssignees([])}
                 >
@@ -480,8 +479,8 @@ function CreateTaskModal({ group, onClose, onRefresh }) {
                   <span>Chưa giao</span>
                 </div>
                 {group.members.map(m => (
-                  <div 
-                    key={m.maNguoiDung} 
+                  <div
+                    key={m.maNguoiDung}
                     className={`ms-item ${assignees.includes(m.maNguoiDung) ? 'active' : ''}`}
                     onClick={() => setAssignees([m.maNguoiDung])}
                   >
@@ -494,17 +493,17 @@ function CreateTaskModal({ group, onClose, onRefresh }) {
 
             <div className="smg-form-group">
               <label>Mô tả công việc</label>
-              <textarea 
-                className="smg-input" 
-                rows="2" 
-                placeholder="Nhập mô tả yêu cầu chi tiết..." 
-                value={moTa} 
-                onChange={e => setMoTa(e.target.value)} 
+              <textarea
+                className="smg-input"
+                rows="2"
+                placeholder="Nhập mô tả yêu cầu chi tiết..."
+                value={moTa}
+                onChange={e => setMoTa(e.target.value)}
               />
             </div>
 
             <div className="smg-form-group">
-              <div 
+              <div
                 className={`refined-upload-zone ${dragover ? 'dragover' : ''}`}
                 onDragOver={e => { e.preventDefault(); setDragover(true); }}
                 onDragLeave={() => setDragover(false)}
@@ -585,11 +584,11 @@ function TopicDetailModal({ topic, groupName, onClose }) {
             <div className="topic-detail-section">
               <span>Tài liệu đính kèm từ Giảng viên</span>
               <p>
-                <a 
-                  href={buildFileUrl(topic.tepDinhKem.duongDan)} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="topic-file-link" 
+                <a
+                  href={buildFileUrl(topic.tepDinhKem.duongDan)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="topic-file-link"
                   style={{ color: '#378add', textDecoration: 'underline', display: 'flex', alignItems: 'center', gap: '8px', marginTop: '5px' }}
                 >
                   📄 {topic.tepDinhKem.tenTep}
@@ -768,11 +767,11 @@ const StudentManageGroup = () => {
 
           const kanban = [
             { label: 'Cần làm', labelColor: '#888', cls: 'notstart', tasks: tasks.filter(t => t.trangThai === 'Chưa bắt đầu').map(mapToKanbanTask) },
-            { 
-              label: 'Đang làm', 
-              labelColor: '#185fa5', 
-              cls: 'doing', 
-              tasks: tasks.filter(t => ['Đang thực hiện', 'Làm lại', 'Trễ hạn'].includes(t.trangThai)).map(mapToKanbanTask) 
+            {
+              label: 'Đang làm',
+              labelColor: '#185fa5',
+              cls: 'doing',
+              tasks: tasks.filter(t => ['Đang thực hiện', 'Làm lại', 'Trễ hạn'].includes(t.trangThai)).map(mapToKanbanTask)
             },
             { label: 'Đợi duyệt', labelColor: '#854f0b', cls: 'wait', tasks: tasks.filter(t => t.trangThai === 'Chờ duyệt').map(mapToKanbanTask) },
             { label: 'Hoàn tất', labelColor: '#3b6d11', cls: 'done', tasks: tasks.filter(t => t.trangThai === 'Hoàn thành').map(mapToKanbanTask) }
