@@ -1,70 +1,174 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './ManageTopics.css';
-import { FaSearch, FaPlus, FaBook, FaEdit, FaTrash } from 'react-icons/fa';
-
-const initialTopics = [
-  { id: 1, title: 'Xây dựng hệ thống quản lý lớp học', teacher: 'Thầy Minh Khang', status: 'Đang mở', startDate: '2026-01-15', endDate: '2026-05-30' },
-  { id: 2, title: 'Ứng dụng bán hàng trực tuyến', teacher: 'Thầy Minh Khang', status: 'Đã đóng', startDate: '2025-09-10', endDate: '2025-12-20' },
-  { id: 3, title: 'Phân tích dữ liệu học tập', teacher: 'Thầy Minh Khang', status: 'Đang mở', startDate: '2026-02-01', endDate: '2026-06-10' }
-];
+import { FaSearch, FaPlus, FaBook, FaEdit, FaTrash, FaCheckCircle, FaUserCheck, FaTimes } from 'react-icons/fa';
+import detaiService from '../../../services/deTaiService';
+import classService from '../../../services/classService';
+import nhomService from '../../../services/nhomService';
+import apiClient from '../../../services/apiClient';
 
 const ManageTopics = () => {
-  const [topics, setTopics] = useState(initialTopics);
+  const [classes, setClasses] = useState([]);
+  const [filterClass, setFilterClass] = useState('');
+  const [topics, setTopics] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [newTopic, setNewTopic] = useState({ title: '', startDate: '', endDate: '' });
+  const [newTopic, setNewTopic] = useState({ tenDeTai: '', ngayBatDau: '', ngayKetThuc: '' });
   const [editingTopicId, setEditingTopicId] = useState(null);
+  const [groupsInClass, setGroupsInClass] = useState([]);
+  const [assigningTopicId, setAssigningTopicId] = useState(null);
+  const [selectedGroupForAssign, setSelectedGroupForAssign] = useState('');
+
+  // Fetch classes
+  useEffect(() => {
+    const fetchClasses = async () => {
+      try {
+        const data = await classService.getTeacherClasses();
+        setClasses(data);
+        if (data.length > 0) {
+          setFilterClass(data[0].maLop);
+        }
+      } catch (error) {
+        console.error('Error fetching classes:', error);
+      }
+    };
+    fetchClasses();
+  }, []);
+
+  // Fetch topics
+  const fetchTopics = async (classId) => {
+    try {
+      if (!classId) {
+        setTopics([]);
+        return;
+      }
+      const data = await detaiService.getByClass(classId);
+      setTopics(data);
+    } catch (error) {
+      console.error('Error fetching topics:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (filterClass) {
+      fetchTopics(filterClass);
+      // Fetch groups in class for assign feature
+      const fetchGroups = async () => {
+        try {
+          const data = await nhomService.getGroupsByClass(filterClass);
+          setGroupsInClass(data);
+        } catch (e) {
+          setGroupsInClass([]);
+        }
+      };
+      fetchGroups();
+    } else {
+      setTopics([]);
+      setGroupsInClass([]);
+    }
+  }, [filterClass]);
 
   const filteredTopics = topics.filter((topic) =>
-    topic.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    topic.teacher.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    topic.status.toLowerCase().includes(searchTerm.toLowerCase())
+    (topic.tenDeTai && topic.tenDeTai.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!newTopic.title || !newTopic.startDate || !newTopic.endDate) {
+    if (!filterClass) {
+      alert('Vui lòng chọn lớp học trước.');
+      return;
+    }
+    if (!newTopic.tenDeTai || !newTopic.ngayBatDau || !newTopic.ngayKetThuc) {
       alert('Vui lòng điền đầy đủ thông tin đề tài.');
       return;
     }
 
-    if (editingTopicId !== null) {
-      setTopics(topics.map(topic => 
-        topic.id === editingTopicId ? { ...topic, title: newTopic.title, startDate: newTopic.startDate, endDate: newTopic.endDate } : topic
-      ));
-      setEditingTopicId(null);
-      setNewTopic({ title: '', startDate: '', endDate: '' });
-      alert('Đã cập nhật đề tài.');
-    } else {
-      const nextId = Math.max(0, ...topics.map((topic) => topic.id)) + 1;
-      setTopics([
-        ...topics,
-        {
-          id: nextId,
-          title: newTopic.title,
-          teacher: 'Thầy Minh Khang',
-          status: 'Đang mở',
-          startDate: newTopic.startDate,
-          endDate: newTopic.endDate
-        }
-      ]);
-      setNewTopic({ title: '', startDate: '', endDate: '' });
-      alert('Đã thêm đề tài mới.');
+    try {
+      if (editingTopicId !== null) {
+        await detaiService.update(editingTopicId, {
+          ...newTopic
+        });
+        alert('Đã cập nhật đề tài.');
+        setEditingTopicId(null);
+      } else {
+        await detaiService.create({
+          ...newTopic,
+          maLop: filterClass,
+          phuongThucGiao: 'Đăng ký tự do'
+        });
+        alert('Đã thêm đề tài mới.');
+      }
+      setNewTopic({ tenDeTai: '', ngayBatDau: '', ngayKetThuc: '' });
+      fetchTopics(filterClass);
+    } catch (error) {
+      alert(error.message || 'Lỗi khi lưu đề tài');
     }
   };
 
   const handleEditClick = (topic) => {
-    setEditingTopicId(topic.id);
-    setNewTopic({ title: topic.title, startDate: topic.startDate, endDate: topic.endDate });
+    setEditingTopicId(topic.maDeTai);
+    setNewTopic({
+      tenDeTai: topic.tenDeTai || '',
+      ngayBatDau: topic.ngayBatDau || '',
+      ngayKetThuc: topic.ngayKetThuc || ''
+    });
   };
 
   const handleCancelEdit = () => {
     setEditingTopicId(null);
-    setNewTopic({ title: '', startDate: '', endDate: '' });
+    setNewTopic({ tenDeTai: '', ngayBatDau: '', ngayKetThuc: '' });
   };
 
-  const handleDeleteTopic = (id) => {
+  const handleDeleteTopic = async (topic) => {
+    if (topic.daCoNhom) {
+      alert('Không thể xóa đề tài này vì đã có nhóm đăng ký.');
+      return;
+    }
     if (window.confirm('Bạn có chắc muốn xóa đề tài này?')) {
-      setTopics(topics.filter((topic) => topic.id !== id));
+      try {
+        await detaiService.delete(topic.maDeTai);
+        alert('Xóa đề tài thành công');
+        fetchTopics(filterClass);
+      } catch (error) {
+        if (error.message?.includes('ràng buộc')) {
+          alert('Không thể xóa đề tài do lỗi ràng buộc hệ thống.');
+        } else {
+          alert(error.message || 'Lỗi khi xóa đề tài');
+        }
+      }
+    }
+  };
+
+  const handleAssignTopic = async (topic) => {
+    if (!selectedGroupForAssign) {
+      alert('Vui lòng chọn nhóm để giao đề tài.');
+      return;
+    }
+    try {
+      await apiClient.post('/api/detai/cap-nhat-giao', {
+        maDeTai: topic.maDeTai,
+        maNhom: parseInt(selectedGroupForAssign),
+        phuongThucGiao: 'Chỉ định trực tiếp'
+      });
+      alert('Đã giao đề tài cho nhóm thành công!');
+      setAssigningTopicId(null);
+      setSelectedGroupForAssign('');
+      fetchTopics(filterClass);
+    } catch (error) {
+      alert(error.message || 'Lỗi khi giao đề tài');
+    }
+  };
+
+  const handleUnassignTopic = async (topic) => {
+    if (!window.confirm(`Bạn có chắc muốn gỡ nhóm "${topic.tenNhom}" khỏi đề tài này?`)) return;
+    try {
+      await apiClient.post('/api/detai/cap-nhat-giao', {
+        maDeTai: topic.maDeTai,
+        maNhom: 0,
+        phuongThucGiao: 'Đăng ký tự do'
+      });
+      alert('Đã gỡ nhóm khỏi đề tài.');
+      fetchTopics(filterClass);
+    } catch (error) {
+      alert(error.message || 'Lỗi khi gỡ nhóm');
     }
   };
 
@@ -75,14 +179,29 @@ const ManageTopics = () => {
           <h2>Quản lý Đề tài</h2>
           <p>Quản lý danh sách đề tài cho giảng viên, thêm mới và xem trạng thái đề tài.</p>
         </div>
-        <div className="manage-topics-search">
-          <FaSearch />
-          <input
-            type="text"
-            placeholder="Tìm kiếm đề tài, trạng thái hoặc giảng viên..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+        <div style={{ display: 'flex', gap: '15px' }}>
+          <select
+            className="class-filter-select"
+            value={filterClass}
+            onChange={(e) => setFilterClass(e.target.value)}
+            style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid #ddd', outline: 'none' }}
+          >
+            <option value="">-- Chọn lớp học --</option>
+            {classes.map((cls) => (
+              <option key={cls.maLop} value={cls.maLop}>
+                {cls.tenLop} ({cls.maLopHoc})
+              </option>
+            ))}
+          </select>
+          <div className="manage-topics-search">
+            <FaSearch />
+            <input
+              type="text"
+              placeholder="Tìm kiếm đề tài..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
         </div>
       </div>
 
@@ -94,29 +213,91 @@ const ManageTopics = () => {
           </div>
 
           <div className="topic-list">
-            {filteredTopics.length === 0 ? (
+            {!filterClass ? (
+              <div className="topic-empty">Vui lòng chọn lớp học để xem đề tài.</div>
+            ) : filteredTopics.length === 0 ? (
               <div className="topic-empty">Không có đề tài phù hợp.</div>
             ) : (
-              filteredTopics.map((topic) => (
-                <div key={topic.id} className="topic-card">
-                  <div className="topic-info">
-                    <h4>{topic.title}</h4>
-                    <p>Giảng viên: {topic.teacher}</p>
-                    <p>Thời gian: {topic.startDate} → {topic.endDate}</p>
+              filteredTopics.map((topic) => {
+                // Tính trạng thái dựa trên ngày
+                const now = new Date();
+                const startDate = new Date(topic.ngayBatDau);
+                const endDate = new Date(topic.ngayKetThuc);
+                let status = 'Chưa mở';
+                let statusClass = 'closed';
+                if (now >= startDate && now <= endDate) {
+                  status = 'Đang mở';
+                  statusClass = 'open';
+                } else if (now > endDate) {
+                  status = 'Đã đóng';
+                  statusClass = 'closed';
+                }
+
+                return (
+                  <div key={topic.maDeTai} className="topic-card">
+                    <div className="topic-info">
+                      <h4>{topic.tenDeTai}</h4>
+                      <p>Thời gian: {topic.ngayBatDau} → {topic.ngayKetThuc}</p>
+                      {topic.daCoNhom && (
+                        <p style={{ color: 'green', fontSize: '13px', marginTop: '5px' }}>
+                          <FaCheckCircle style={{ marginRight: '5px', verticalAlign: 'text-bottom' }} />
+                          Đã được nhận bởi: {topic.tenNhom}
+                        </p>
+                      )}
+                    </div>
+                    <div className="topic-actions">
+                      <span className={`topic-status topic-status-${statusClass}`}>
+                        {status}
+                      </span>
+                      {!topic.daCoNhom ? (
+                        <button className="btn-icon" title="Giao cho nhóm" style={{color: '#0ea5e9'}} onClick={() => { setAssigningTopicId(assigningTopicId === topic.maDeTai ? null : topic.maDeTai); setSelectedGroupForAssign(''); }}>
+                          <FaUserCheck />
+                        </button>
+                      ) : (
+                        <button className="btn-icon" title="Gỡ nhóm" style={{color: '#f97316'}} onClick={() => handleUnassignTopic(topic)}>
+                          <FaTimes />
+                        </button>
+                      )}
+                      <button className="btn-icon edit" title="Sửa đề tài" onClick={() => handleEditClick(topic)}>
+                        <FaEdit />
+                      </button>
+                      <button className="btn-icon delete" title="Xóa đề tài" onClick={() => handleDeleteTopic(topic)}>
+                        <FaTrash />
+                      </button>
+                    </div>
+
+                    {/* Dropdown chọn nhóm */}
+                    {assigningTopicId === topic.maDeTai && (
+                      <div style={{marginTop: '10px', padding: '10px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0'}}>
+                        <div style={{display: 'flex', gap: '8px', alignItems: 'center'}}>
+                          <select
+                            value={selectedGroupForAssign}
+                            onChange={(e) => setSelectedGroupForAssign(e.target.value)}
+                            style={{flex: 1, padding: '6px 10px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '13px'}}
+                          >
+                            <option value="">-- Chọn nhóm --</option>
+                            {groupsInClass.map(g => (
+                              <option key={g.maNhom} value={g.maNhom}>{g.tenNhom} ({g.soThanhVienHienTai}/{g.soThanhVienToiDa} SV)</option>
+                            ))}
+                          </select>
+                          <button
+                            onClick={() => handleAssignTopic(topic)}
+                            style={{padding: '6px 14px', background: '#0ea5e9', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', whiteSpace: 'nowrap'}}
+                          >
+                            Giao
+                          </button>
+                          <button
+                            onClick={() => setAssigningTopicId(null)}
+                            style={{padding: '6px 10px', background: '#e2e8f0', color: '#475569', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '13px'}}
+                          >
+                            Hủy
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  <div className="topic-actions">
-                    <span className={`topic-status topic-status-${topic.status === 'Đang mở' ? 'open' : 'closed'}`}>
-                      {topic.status}
-                    </span>
-                    <button className="btn-icon edit" title="Sửa đề tài" onClick={() => handleEditClick(topic)}>
-                      <FaEdit />
-                    </button>
-                    <button className="btn-icon delete" title="Xóa đề tài" onClick={() => handleDeleteTopic(topic.id)}>
-                      <FaTrash />
-                    </button>
-                  </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         </section>
@@ -132,8 +313,8 @@ const ManageTopics = () => {
               Tên đề tài
               <input
                 type="text"
-                value={newTopic.title}
-                onChange={(e) => setNewTopic({ ...newTopic, title: e.target.value })}
+                value={newTopic.tenDeTai}
+                onChange={(e) => setNewTopic({ ...newTopic, tenDeTai: e.target.value })}
                 placeholder="Nhập tên đề tài..."
               />
             </label>
@@ -141,20 +322,20 @@ const ManageTopics = () => {
               Ngày bắt đầu
               <input
                 type="date"
-                value={newTopic.startDate}
-                onChange={(e) => setNewTopic({ ...newTopic, startDate: e.target.value })}
+                value={newTopic.ngayBatDau}
+                onChange={(e) => setNewTopic({ ...newTopic, ngayBatDau: e.target.value })}
               />
             </label>
             <label>
               Ngày kết thúc
               <input
                 type="date"
-                value={newTopic.endDate}
-                onChange={(e) => setNewTopic({ ...newTopic, endDate: e.target.value })}
+                value={newTopic.ngayKetThuc}
+                onChange={(e) => setNewTopic({ ...newTopic, ngayKetThuc: e.target.value })}
               />
             </label>
             <div style={{ display: 'flex', gap: '10px' }}>
-              <button type="submit" className="btn-add-topic">
+              <button type="submit" className="btn-add-topic" disabled={!filterClass}>
                 {editingTopicId ? <><FaEdit /> Cập nhật</> : <><FaPlus /> Thêm đề tài</>}
               </button>
               {editingTopicId && (

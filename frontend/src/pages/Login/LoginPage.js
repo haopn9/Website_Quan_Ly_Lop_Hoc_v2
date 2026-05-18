@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import './LoginPage.css';
 import loginIllustration from '../../assets/login-illustration.png';
 import { FaEye, FaEyeSlash, FaTimes, FaArrowLeft } from 'react-icons/fa';
+import authService from '../../services/authService';
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -83,25 +84,15 @@ const LoginPage = () => {
     setError('');
 
     try {
-      // Giả lập thời gian gọi API tốn 1 giây
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // Mock data logic kiểm tra tài khoản
-      if (password !== '123456') {
-        throw new Error('Sai tài khoản hoặc mật khẩu (Gợi ý pass: 123456)');
-      }
-
+      const data = await authService.login(username, password);
+      
       alert('Đăng nhập thành công!');
 
-      // Điều hướng dựa trên username (Mock)
-      if (username === 'admin') {
+      if (data.maVaiTro === 1) {
         navigate('/admin/dashboard');
-      } else if (username === 'teacher') {
+      } else if (data.maVaiTro === 2) {
         navigate('/teacher/classes');
-      } else if (username === 'student') {
-        navigate('/student/dashboard');
       } else {
-        // Mặc định cho sinh viên nếu nhập tài khoản khác
         navigate('/student/dashboard');
       }
     } catch (err) {

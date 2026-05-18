@@ -1,58 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './ManageGroups.css';
 import { FaPlus, FaSearch, FaUsers, FaUserFriends, FaCrown, FaRandom, FaUserPlus, FaUserMinus, FaTimes, FaChalkboard } from 'react-icons/fa';
-
-// ===== DỮ LIỆU GIẢ LẬP =====
-const initialGroups = [
-  {
-    groupId: 1, groupName: 'Nhóm 1', maxMembers: 5, classId: 1, className: 'Lập trình Web',
-    leaderId: 101, leaderName: 'Nguyễn Văn An',
-    members: [
-      { userId: 101, userCode: 'SV001', fullName: 'Nguyễn Văn An', role: 'leader' },
-      { userId: 102, userCode: 'SV002', fullName: 'Trần Thị Bình', role: 'member' },
-      { userId: 103, userCode: 'SV003', fullName: 'Lê Hoàng Cường', role: 'member' },
-      { userId: 104, userCode: 'SV004', fullName: 'Phạm Minh Đức', role: 'member' },
-    ]
-  },
-  {
-    groupId: 2, groupName: 'Nhóm 2', maxMembers: 5, classId: 1, className: 'Lập trình Web',
-    leaderId: 105, leaderName: 'Hoàng Thị Hoa',
-    members: [
-      { userId: 105, userCode: 'SV005', fullName: 'Hoàng Thị Hoa', role: 'leader' },
-      { userId: 106, userCode: 'SV006', fullName: 'Võ Thanh Hùng', role: 'member' },
-      { userId: 107, userCode: 'SV007', fullName: 'Đặng Quốc Bảo', role: 'member' },
-    ]
-  },
-  {
-    groupId: 3, groupName: 'Nhóm 3', maxMembers: 5, classId: 1, className: 'Lập trình Web',
-    leaderId: null, leaderName: null,
-    members: [
-      { userId: 108, userCode: 'SV008', fullName: 'Ngô Hải Yến', role: 'member' },
-      { userId: 109, userCode: 'SV009', fullName: 'Lý Minh Tâm', role: 'member' },
-    ]
-  },
-  {
-    groupId: 4, groupName: 'Nhóm 1', maxMembers: 4, classId: 2, className: 'Cơ sở dữ liệu',
-    leaderId: 201, leaderName: 'Đỗ Quang Khải',
-    members: [
-      { userId: 201, userCode: 'SV010', fullName: 'Đỗ Quang Khải', role: 'leader' },
-      { userId: 202, userCode: 'SV011', fullName: 'Bùi Anh Tuấn', role: 'member' },
-      { userId: 203, userCode: 'SV012', fullName: 'Trịnh Thu Hà', role: 'member' },
-      { userId: 204, userCode: 'SV013', fullName: 'Mai Đức Thịnh', role: 'member' },
-    ]
-  },
-];
-
-const unassignedStudents = [
-  { userId: 110, userCode: 'SV014', fullName: 'Phùng Thanh Tùng', classId: 1 },
-  { userId: 111, userCode: 'SV015', fullName: 'Trương Bảo Ngọc', classId: 1 },
-  { userId: 205, userCode: 'SV016', fullName: 'Cao Minh Phát', classId: 2 },
-];
+import nhomService from '../../../services/nhomService';
+import classService from '../../../services/classService';
 
 const ManageGroups = () => {
-  const [groups, setGroups] = useState(initialGroups);
+  const [classes, setClasses] = useState([]);
+  const [groups, setGroups] = useState([]);
+  const [unassignedStudents, setUnassignedStudents] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterClass, setFilterClass] = useState('all');
+  const [filterClass, setFilterClass] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
 
   // Modal states
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -61,135 +19,147 @@ const ManageGroups = () => {
   const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState(null);
 
-  // Form
-  const [formData, setFormData] = useState({
-    groupName: '', maxMembers: 5, classId: 1
-  });
-  const [randomForm, setRandomForm] = useState({ classId: 1, membersPerGroup: 4 });
+  // Form states
+  const [formData, setFormData] = useState({ groupName: '', maxMembers: 5 });
   const [selectedLeaderId, setSelectedLeaderId] = useState('');
   const [selectedStudentId, setSelectedStudentId] = useState('');
 
+  const fetchClasses = async () => {
+    try {
+      const classData = await classService.getTeacherClasses();
+      setClasses(classData);
+      if (classData.length > 0) {
+        setFilterClass(classData[0].maLop.toString());
+      } else {
+        setIsLoading(false);
+      }
+    } catch (error) {
+      console.error('Error fetching classes:', error);
+      setIsLoading(false);
+    }
+  };
+
+  const fetchGroupsAndStudents = async (classId) => {
+    setIsLoading(true);
+    try {
+      const [groupData, studentData] = await Promise.all([
+        nhomService.getGroupsByClass(classId),
+        classService.getUnassignedStudents(classId)
+      ]);
+      setGroups(groupData);
+      setUnassignedStudents(studentData);
+    } catch (error) {
+      console.error('Error fetching groups/students:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchClasses();
+  }, []);
+
+  useEffect(() => {
+    if (filterClass) {
+      fetchGroupsAndStudents(filterClass);
+    }
+  }, [filterClass]);
+
   const handleFormChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: name === 'maxMembers' || name === 'classId' ? parseInt(value) : value });
+    setFormData({ ...formData, [name]: name === 'maxMembers' ? parseInt(value) : value });
   };
 
-  const handleCreateGroup = (e) => {
+  const handleCreateGroup = async (e) => {
     e.preventDefault();
-    const classNames = { 1: 'Lập trình Web', 2: 'Cơ sở dữ liệu' };
-    const newGroup = {
-      groupId: Date.now(),
-      ...formData,
-      className: classNames[formData.classId],
-      leaderId: null, leaderName: null,
-      members: []
-    };
-    setGroups([...groups, newGroup]);
-    setIsCreateModalOpen(false);
-    setFormData({ groupName: '', maxMembers: 5, classId: 1 });
-    alert('Tạo nhóm thành công!');
-  };
-
-  const handleRandomAssign = () => {
-    const classNames = { 1: 'Lập trình Web', 2: 'Cơ sở dữ liệu' };
-    const studentsForClass = unassignedStudents.filter(s => s.classId === randomForm.classId);
-    const numGroups = Math.ceil(studentsForClass.length / randomForm.membersPerGroup);
-
-    if (studentsForClass.length === 0) {
-      alert('Không có sinh viên chưa có nhóm trong lớp này!');
-      return;
-    }
-
-    const newGroups = [];
-    for (let i = 0; i < numGroups; i++) {
-      newGroups.push({
-        groupId: Date.now() + i,
-        groupName: `Nhóm mới ${i + 1}`,
-        maxMembers: randomForm.membersPerGroup,
-        classId: randomForm.classId,
-        className: classNames[randomForm.classId],
-        leaderId: null, leaderName: null,
-        members: studentsForClass.slice(i * randomForm.membersPerGroup, (i + 1) * randomForm.membersPerGroup)
-          .map(s => ({ ...s, role: 'member' }))
+    if (!filterClass) return alert('Vui lòng chọn lớp học trước');
+    try {
+      await nhomService.createGroup({
+        tenNhom: formData.groupName,
+        maLop: parseInt(filterClass),
+        soThanhVienToiDa: formData.maxMembers
       });
+      alert('Tạo nhóm thành công!');
+      setIsCreateModalOpen(false);
+      setFormData({ groupName: '', maxMembers: 5 });
+      fetchGroupsAndStudents(filterClass);
+    } catch (error) {
+      alert(error.response?.data?.thongBao || 'Lỗi khi tạo nhóm');
     }
-    setGroups([...groups, ...newGroups]);
-    setIsRandomModalOpen(false);
-    alert(`Đã tạo ${numGroups} nhóm ngẫu nhiên với ${studentsForClass.length} sinh viên!`);
   };
 
-  const handleAssignLeader = () => {
-    if (!selectedLeaderId || !selectedGroup) return;
-    const leaderId = parseInt(selectedLeaderId);
-    const leader = selectedGroup.members.find(m => m.userId === leaderId);
-
-    setGroups(groups.map(g => {
-      if (g.groupId === selectedGroup.groupId) {
-        return {
-          ...g,
-          leaderId: leaderId,
-          leaderName: leader?.fullName || '',
-          members: g.members.map(m => ({
-            ...m,
-            role: m.userId === leaderId ? 'leader' : 'member'
-          }))
-        };
-      }
-      return g;
-    }));
-    setIsAssignLeaderModalOpen(false);
-    alert(`Đã chỉ định ${leader?.fullName} làm nhóm trưởng!`);
+  const handleRandomAssign = async () => {
+    if (!filterClass) return;
+    try {
+      const res = await nhomService.randomAssign(parseInt(filterClass));
+      alert(res.thongBao || 'Phân nhóm ngẫu nhiên thành công!');
+      setIsRandomModalOpen(false);
+      fetchGroupsAndStudents(filterClass);
+    } catch (error) {
+      alert(error.response?.data?.thongBao || 'Lỗi khi phân nhóm ngẫu nhiên');
+    }
   };
 
-  const handleAddMember = () => {
+  const handleAssignLeader = async () => {
+    if (!selectedGroup) return;
+    try {
+      await nhomService.assignLeader(selectedGroup.maNhom, selectedLeaderId ? parseInt(selectedLeaderId) : null);
+      alert('Cập nhật nhóm trưởng thành công!');
+      setIsAssignLeaderModalOpen(false);
+      fetchGroupsAndStudents(filterClass);
+    } catch (error) {
+      alert(error.response?.data?.thongBao || 'Lỗi khi cập nhật nhóm trưởng');
+    }
+  };
+
+  const handleAddMember = async () => {
     if (!selectedStudentId || !selectedGroup) return;
-    const student = unassignedStudents.find(s => s.userId === parseInt(selectedStudentId));
-    if (!student) return;
+    try {
+      await nhomService.addMember(selectedGroup.maNhom, parseInt(selectedStudentId));
+      alert('Thêm thành viên thành công!');
+      setIsAddMemberModalOpen(false);
+      fetchGroupsAndStudents(filterClass);
+    } catch (error) {
+      alert(error.response?.data?.thongBao || 'Lỗi khi thêm thành viên');
+    }
+  };
 
-    if (selectedGroup.members.length >= selectedGroup.maxMembers) {
-      alert('Nhóm đã đạt số lượng thành viên tối đa!');
+  const handleRemoveMember = async (groupId, userId) => {
+    if (window.confirm('Xóa thành viên khỏi nhóm?')) {
+      try {
+        await nhomService.removeMember(groupId, userId);
+        alert('Đã xóa thành viên khỏi nhóm');
+        fetchGroupsAndStudents(filterClass);
+      } catch (error) {
+        alert(error.response?.data?.thongBao || 'Lỗi khi xóa thành viên');
+      }
+    }
+  };
+
+  const handleDeleteGroup = async (group) => {
+    if (group.soThanhVienHienTai > 0) {
+      alert('Không thể xóa vì nhóm đang có thành viên. Vui lòng xóa hết thành viên trước khi xóa nhóm.');
       return;
     }
 
-    setGroups(groups.map(g => {
-      if (g.groupId === selectedGroup.groupId) {
-        return {
-          ...g,
-          members: [...g.members, { ...student, role: 'member' }]
-        };
-      }
-      return g;
-    }));
-    setIsAddMemberModalOpen(false);
-    alert(`Đã thêm ${student.fullName} vào ${selectedGroup.groupName}!`);
-  };
-
-  const handleRemoveMember = (groupId, userId) => {
-    if (window.confirm('Xóa thành viên khỏi nhóm?')) {
-      setGroups(groups.map(g => {
-        if (g.groupId === groupId) {
-          const updatedMembers = g.members.filter(m => m.userId !== userId);
-          return {
-            ...g,
-            members: updatedMembers,
-            leaderId: g.leaderId === userId ? null : g.leaderId,
-            leaderName: g.leaderId === userId ? null : g.leaderName
-          };
+    if (window.confirm('Bạn có chắc muốn xóa nhóm này? Dữ liệu không thể khôi phục.')) {
+      try {
+        await nhomService.deleteGroup(group.maNhom);
+        alert('Xóa nhóm thành công');
+        fetchGroupsAndStudents(filterClass);
+      } catch (error) {
+        if (error.response?.status === 500) {
+          alert('Hệ thống từ chối xóa do nhóm đang có dữ liệu ràng buộc (có thể đã phát sinh lỗi hệ thống hoặc dữ liệu liên quan khác).');
+        } else {
+          alert(error.response?.data?.thongBao || 'Lỗi khi xóa nhóm');
         }
-        return g;
-      }));
-    }
-  };
-
-  const handleDeleteGroup = (groupId) => {
-    if (window.confirm('Bạn có chắc muốn xóa nhóm này?')) {
-      setGroups(groups.filter(g => g.groupId !== groupId));
+      }
     }
   };
 
   const openAssignLeader = (group) => {
     setSelectedGroup(group);
-    setSelectedLeaderId(group.leaderId?.toString() || '');
+    setSelectedLeaderId(group.maNhomTruong?.toString() || '');
     setIsAssignLeaderModalOpen(true);
   };
 
@@ -199,18 +169,20 @@ const ManageGroups = () => {
     setIsAddMemberModalOpen(true);
   };
 
-  // Filter
+  // Filter groups locally by search term
   const filteredGroups = groups.filter(g => {
-    const matchSearch = g.groupName.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchClass = filterClass === 'all' || g.classId === parseInt(filterClass);
-    return matchSearch && matchClass;
+    return (g.tenNhom || '').toLowerCase().includes((searchTerm || '').toLowerCase());
   });
 
   // Stats
   const totalGroups = groups.length;
-  const totalMembers = groups.reduce((sum, g) => sum + g.members.length, 0);
-  const groupsWithLeader = groups.filter(g => g.leaderId).length;
-  const groupsWithoutLeader = groups.filter(g => !g.leaderId).length;
+  const totalMembers = groups.reduce((sum, g) => sum + (g.thanhVien?.length || 0), 0);
+  const groupsWithLeader = groups.filter(g => g.maNhomTruong).length;
+  const groupsWithoutLeader = groups.filter(g => !g.maNhomTruong).length;
+
+  if (isLoading) {
+    return <div className="loading-state">Đang tải dữ liệu...</div>;
+  }
 
   return (
     <div className="manage-groups-container">
@@ -224,10 +196,25 @@ const ManageGroups = () => {
           <button className="btn-secondary" onClick={() => setIsRandomModalOpen(true)}>
             <FaRandom /> Phân nhóm ngẫu nhiên
           </button>
-          <button className="btn-primary" onClick={() => setIsCreateModalOpen(true)}>
+          <button className="btn-primary" onClick={() => { setFormData({ groupName: '', maxMembers: 5 }); setIsCreateModalOpen(true); }}>
             <FaPlus /> Tạo nhóm mới
           </button>
         </div>
+      </div>
+
+      {/* TOOLBAR */}
+      <div className="toolbar-row">
+        <div className="search-box">
+          <FaSearch className="search-icon" />
+          <input type="text" placeholder="Tìm kiếm nhóm..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+        </div>
+        <select className="filter-select" value={filterClass} onChange={(e) => setFilterClass(e.target.value)}>
+          {classes.length === 0 ? (
+            <option value="">Chưa có lớp học</option>
+          ) : (
+            classes.map(c => <option key={c.maLop} value={c.maLop}>{c.tenLop} ({c.maLopHoc})</option>)
+          )}
+        </select>
       </div>
 
       {/* THỐNG KÊ */}
@@ -262,43 +249,30 @@ const ManageGroups = () => {
         </div>
       </div>
 
-      {/* TOOLBAR */}
-      <div className="toolbar-row">
-        <div className="search-box">
-          <FaSearch className="search-icon" />
-          <input type="text" placeholder="Tìm kiếm nhóm..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
-        </div>
-        <select className="filter-select" value={filterClass} onChange={(e) => setFilterClass(e.target.value)}>
-          <option value="all">Tất cả lớp</option>
-          <option value="1">Lập trình Web</option>
-          <option value="2">Cơ sở dữ liệu</option>
-        </select>
-      </div>
-
       {/* DANH SÁCH NHÓM */}
       {filteredGroups.length === 0 ? (
         <div className="empty-state">
           <div className="empty-icon">👥</div>
-          <p>Không tìm thấy nhóm nào</p>
+          <p>Không tìm thấy nhóm nào trong lớp này</p>
         </div>
       ) : (
         <div className="groups-grid">
           {filteredGroups.map(group => (
-            <div className="group-card" key={group.groupId}>
+            <div className="group-card" key={group.maNhom}>
               <div className="group-card-top">
-                <h3>{group.groupName}</h3>
-                <span className="group-class-badge">{group.className}</span>
+                <h3>{group.tenNhom}</h3>
+                <span className="group-class-badge">{group.tenLop}</span>
               </div>
 
               <div className="group-card-body">
                 <div className="group-info-row">
                   <div className="group-info-item">
                     <FaUsers className="info-icon" />
-                    <span>Thành viên: <strong>{group.members.length}/{group.maxMembers}</strong></span>
+                    <span>Thành viên: <strong>{group.soThanhVienHienTai}/{group.soThanhVienToiDa}</strong></span>
                   </div>
-                  {group.leaderName ? (
+                  {group.nhomTruong && group.nhomTruong !== "Chưa có" ? (
                     <span className="leader-badge">
-                      <FaCrown className="crown-icon" /> {group.leaderName}
+                      <FaCrown className="crown-icon" /> {group.nhomTruong}
                     </span>
                   ) : (
                     <span className="leader-badge" style={{ background: '#fee2e2', color: '#dc2626' }}>
@@ -309,23 +283,23 @@ const ManageGroups = () => {
 
                 <div className="member-list-mini">
                   <h4>Danh sách thành viên</h4>
-                  {group.members.length === 0 ? (
+                  {(!group.thanhVien || group.thanhVien.length === 0) ? (
                     <p style={{ fontSize: 13, color: '#94a3b8', textAlign: 'center' }}>Chưa có thành viên</p>
                   ) : (
-                    group.members.map(member => (
-                      <div className="member-item" key={member.userId}>
+                    group.thanhVien.map(member => (
+                      <div className="member-item" key={member.maNguoiDung}>
                         <div className="member-name">
-                          <span>{member.fullName}</span>
-                          <span className="member-code">{member.userCode}</span>
+                          <span>{member.hoTen}</span>
+                          <span className="member-code">{member.maSo}</span>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <span className={`member-role-tag ${member.role}`}>
-                            {member.role === 'leader' ? '👑 Trưởng nhóm' : 'Thành viên'}
+                          <span className={`member-role-tag ${member.vaiTroTrongNhom}`}>
+                            {member.vaiTroTrongNhom === 'leader' ? '👑 Trưởng nhóm' : 'Thành viên'}
                           </span>
                           <button
                             className="btn-sm danger"
                             style={{ padding: '3px 8px', fontSize: 11 }}
-                            onClick={() => handleRemoveMember(group.groupId, member.userId)}
+                            onClick={() => handleRemoveMember(group.maNhom, member.maNguoiDung)}
                           >
                             <FaUserMinus />
                           </button>
@@ -343,7 +317,7 @@ const ManageGroups = () => {
                 <button className="btn-sm warning" onClick={() => openAssignLeader(group)}>
                   <FaCrown /> Chỉ định trưởng
                 </button>
-                <button className="btn-sm danger" onClick={() => handleDeleteGroup(group.groupId)}>
+                <button className="btn-sm danger" onClick={() => handleDeleteGroup(group)}>
                   Xóa nhóm
                 </button>
               </div>
@@ -363,20 +337,13 @@ const ManageGroups = () => {
             <form onSubmit={handleCreateGroup}>
               <div className="modal-body">
                 <div className="form-grid">
-                  <div className="form-group">
+                  <div className="form-group" style={{ gridColumn: 'span 2' }}>
                     <label>Tên nhóm *</label>
                     <input type="text" name="groupName" value={formData.groupName} onChange={handleFormChange} placeholder="VD: Nhóm 4" required />
                   </div>
-                  <div className="form-group">
+                  <div className="form-group" style={{ gridColumn: 'span 2' }}>
                     <label>Số thành viên tối đa *</label>
-                    <input type="number" name="maxMembers" value={formData.maxMembers} onChange={handleFormChange} min="2" max="10" required />
-                  </div>
-                  <div className="form-group full-width">
-                    <label>Thuộc lớp *</label>
-                    <select name="classId" value={formData.classId} onChange={handleFormChange}>
-                      <option value="1">Lập trình Web</option>
-                      <option value="2">Cơ sở dữ liệu</option>
-                    </select>
+                    <input type="number" name="maxMembers" value={formData.maxMembers} onChange={handleFormChange} min="2" max="20" required />
                   </div>
                 </div>
               </div>
@@ -400,28 +367,23 @@ const ManageGroups = () => {
             <div className="modal-body">
               <div className="random-assign-info">
                 <h4>📌 Cách hoạt động</h4>
-                <p>Hệ thống sẽ tự động chia các sinh viên chưa có nhóm vào các nhóm mới dựa trên số lượng thành viên bạn chọn.</p>
-              </div>
-              <div className="form-grid">
-                <div className="form-group">
-                  <label>Chọn lớp *</label>
-                  <select value={randomForm.classId} onChange={(e) => setRandomForm({ ...randomForm, classId: parseInt(e.target.value) })}>
-                    <option value="1">Lập trình Web</option>
-                    <option value="2">Cơ sở dữ liệu</option>
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label>Số SV mỗi nhóm *</label>
-                  <input type="number" value={randomForm.membersPerGroup} onChange={(e) => setRandomForm({ ...randomForm, membersPerGroup: parseInt(e.target.value) })} min="2" max="10" />
-                </div>
+                <p>Hệ thống sẽ tự động nhặt các sinh viên chưa có nhóm và điền ngẫu nhiên vào các nhóm đang có sẵn chỗ trống trong lớp này.</p>
               </div>
               <p style={{ fontSize: 13, color: '#64748b', marginTop: 12 }}>
-                SV chưa có nhóm: <strong>{unassignedStudents.filter(s => s.classId === randomForm.classId).length}</strong> người
+                Lớp hiện tại: <strong>{classes.find(c => c.maLop.toString() === filterClass)?.tenLop}</strong>
               </p>
+              <p style={{ fontSize: 13, color: '#64748b', marginTop: 6 }}>
+                SV chưa có nhóm: <strong>{unassignedStudents.length}</strong> người
+              </p>
+              {groups.length === 0 && (
+                <p style={{ fontSize: 13, color: 'red', marginTop: 6 }}>
+                  Lớp này chưa có nhóm nào được tạo. Vui lòng tạo các nhóm trống trước khi phân ngẫu nhiên.
+                </p>
+              )}
             </div>
             <div className="modal-footer">
               <button className="btn-cancel" onClick={() => setIsRandomModalOpen(false)}>Hủy</button>
-              <button className="btn-save" onClick={handleRandomAssign}>Phân nhóm ngẫu nhiên</button>
+              <button className="btn-save" onClick={handleRandomAssign} disabled={groups.length === 0}>Phân nhóm ngẫu nhiên</button>
             </div>
           </div>
         </div>
@@ -432,17 +394,17 @@ const ManageGroups = () => {
         <div className="modal-overlay" onClick={() => setIsAssignLeaderModalOpen(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>Chỉ định nhóm trưởng - {selectedGroup.groupName}</h3>
+              <h3>Chỉ định nhóm trưởng - {selectedGroup.tenNhom}</h3>
               <button className="close-btn" onClick={() => setIsAssignLeaderModalOpen(false)}><FaTimes /></button>
             </div>
             <div className="modal-body">
               <div className="form-group">
                 <label>Chọn thành viên làm nhóm trưởng:</label>
                 <select value={selectedLeaderId} onChange={(e) => setSelectedLeaderId(e.target.value)}>
-                  <option value="">-- Chọn thành viên --</option>
-                  {selectedGroup.members.map(m => (
-                    <option key={m.userId} value={m.userId}>
-                      {m.fullName} ({m.userCode}) {m.userId === selectedGroup.leaderId ? '(Đang là trưởng)' : ''}
+                  <option value="">-- Gỡ nhóm trưởng (Không có) --</option>
+                  {(selectedGroup.thanhVien || []).map(m => (
+                    <option key={m.maNguoiDung} value={m.maNguoiDung}>
+                      {m.hoTen} ({m.maSo}) {m.maNguoiDung === selectedGroup.maNhomTruong ? '(Đang là trưởng)' : ''}
                     </option>
                   ))}
                 </select>
@@ -450,7 +412,7 @@ const ManageGroups = () => {
             </div>
             <div className="modal-footer">
               <button className="btn-cancel" onClick={() => setIsAssignLeaderModalOpen(false)}>Hủy</button>
-              <button className="btn-save" onClick={handleAssignLeader}>Xác nhận chỉ định</button>
+              <button className="btn-save" onClick={handleAssignLeader}>Cập nhật</button>
             </div>
           </div>
         </div>
@@ -461,19 +423,19 @@ const ManageGroups = () => {
         <div className="modal-overlay" onClick={() => setIsAddMemberModalOpen(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>Thêm sinh viên vào {selectedGroup.groupName}</h3>
+              <h3>Thêm sinh viên vào {selectedGroup.tenNhom}</h3>
               <button className="close-btn" onClick={() => setIsAddMemberModalOpen(false)}><FaTimes /></button>
             </div>
             <div className="modal-body">
               <p style={{ fontSize: 13, color: '#64748b', marginBottom: 14 }}>
-                Số chỗ trống: <strong>{selectedGroup.maxMembers - selectedGroup.members.length}</strong>
+                Số chỗ trống: <strong>{selectedGroup.soThanhVienToiDa - selectedGroup.soThanhVienHienTai}</strong>
               </p>
               <div className="form-group">
-                <label>Chọn sinh viên:</label>
+                <label>Chọn sinh viên (chưa có nhóm):</label>
                 <select value={selectedStudentId} onChange={(e) => setSelectedStudentId(e.target.value)}>
                   <option value="">-- Chọn sinh viên --</option>
-                  {unassignedStudents.filter(s => s.classId === selectedGroup.classId).map(s => (
-                    <option key={s.userId} value={s.userId}>{s.fullName} ({s.userCode})</option>
+                  {unassignedStudents.map(s => (
+                    <option key={s.maNguoiDung} value={s.maNguoiDung}>{s.hoTen} ({s.maSo})</option>
                   ))}
                 </select>
               </div>

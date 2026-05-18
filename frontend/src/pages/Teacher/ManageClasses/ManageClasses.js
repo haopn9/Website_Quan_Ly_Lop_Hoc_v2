@@ -1,61 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import './ManageClasses.css';
 import { FaPlus, FaSearch, FaChalkboardTeacher, FaUsers, FaBookOpen, FaCalendarAlt, FaEye, FaEdit, FaTrash, FaTimes, FaCopy } from 'react-icons/fa';
-
-// ===== DỮ LIỆU GIẢ LẬP (Sẽ xóa dần khi có API) =====
-
-const mockStudents = {
-  1: [
-    { userId: 101, userCode: 'SV001', fullName: 'Nguyễn Văn An', groupName: 'Nhóm 1' },
-    { userId: 102, userCode: 'SV002', fullName: 'Trần Thị Bình', groupName: 'Nhóm 1' },
-    { userId: 103, userCode: 'SV003', fullName: 'Lê Hoàng Cường', groupName: 'Nhóm 2' },
-    { userId: 104, userCode: 'SV004', fullName: 'Phạm Minh Đức', groupName: 'Nhóm 2' },
-    { userId: 105, userCode: 'SV005', fullName: 'Hoàng Thị Hoa', groupName: 'Nhóm 3' },
-    { userId: 106, userCode: 'SV006', fullName: 'Võ Thanh Hùng', groupName: 'Chưa có nhóm' },
-  ],
-  2: [
-    { userId: 201, userCode: 'SV010', fullName: 'Đỗ Quang Khải', groupName: 'Nhóm 1' },
-    { userId: 202, userCode: 'SV011', fullName: 'Bùi Anh Tuấn', groupName: 'Nhóm 2' },
-  ],
-};
+import classService from '../../../services/classService';
 
 const ManageClasses = () => {
   const [classes, setClasses] = useState([]);
+  const [semesters, setSemesters] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-
-  // Dữ liệu mock ban đầu thay cho API
-  const initialMockClasses = [
-    {
-      classId: 1,
-      classCode: 'LTW01',
-      className: 'Lập trình Web',
-      semester: 'HK2 2025-2026',
-      startDate: '2026-01-15',
-      endDate: '2026-05-30',
-      studentCount: 45,
-      groupCount: 10,
-      status: 'active',
-      giangVien: 'Nguyễn Văn A'
-    },
-    {
-      classId: 2,
-      classCode: 'CTDL02',
-      className: 'Cấu trúc dữ liệu',
-      semester: 'HK1 2025-2026',
-      startDate: '2025-09-05',
-      endDate: '2026-01-10',
-      studentCount: 60,
-      groupCount: 12,
-      status: 'ended',
-      giangVien: 'Nguyễn Văn A'
-    }
-  ];
-
-  // Lấy dữ liệu từ mock API
-  useEffect(() => {
-    setClasses(initialMockClasses);
-  }, []);
   const [filterSemester, setFilterSemester] = useState('all');
+  const [isLoading, setIsLoading] = useState(true);
 
   // Modal states
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -65,46 +18,115 @@ const ManageClasses = () => {
 
   // Form state
   const [formData, setFormData] = useState({
-    className: '', classCode: '', semester: 'HK2 2025-2026',
-    startDate: '', endDate: ''
+    tenLop: '', 
+    maHocKy: '', 
+    ngayBatDau: '', 
+    ngayKetThuc: '',
+    thoiGianHoc: ''
   });
+
+  // Lấy dữ liệu từ API
+  const fetchData = async () => {
+    try {
+      setIsLoading(true);
+      
+      try {
+        const semestersData = await classService.getSemesters();
+        setSemesters(semestersData || []);
+        if (semestersData && semestersData.length > 0 && filterSemester === 'all') {
+          const currentSem = semestersData.find(s => s.laHienTai) || semestersData[0];
+          setFormData(prev => ({ ...prev, maHocKy: currentSem.maHocKy }));
+        }
+      } catch (semErr) {
+        console.error('Lỗi khi lấy học kỳ:', semErr);
+      }
+
+      try {
+        const classesData = await classService.getTeacherClasses();
+        setClasses(classesData || []);
+      } catch (clsErr) {
+        console.error('Lỗi khi lấy lớp học:', clsErr);
+      }
+
+    } catch (error) {
+      console.error('Error in fetchData:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   // ===== XỬ LÝ =====
   const handleFormChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleCreateClass = (e) => {
-    e.preventDefault();
-
-    const newClass = {
-      classId: Date.now(), // Sử dụng timestamp làm ID giả lập
-      className: formData.className,
-      classCode: formData.classCode,
-      semester: formData.semester,
-      startDate: formData.startDate,
-      endDate: formData.endDate,
-      studentCount: 0, 
-      groupCount: 0, 
-      status: 'active'
-    };
-
-    setClasses([newClass, ...classes]);
-    setIsCreateModalOpen(false);
-    setFormData({ className: '', classCode: '', semester: 'HK2 2025-2026', startDate: '', endDate: '' });
-    alert('Tạo lớp học thành công!');
+  const handleOpenCreate = () => {
+    const currentSem = semesters.find(s => s.laHienTai) || semesters[0];
+    setFormData({ tenLop: '', maHocKy: currentSem ? currentSem.maHocKy : '', ngayBatDau: '', ngayKetThuc: '', thoiGianHoc: '' });
+    setIsCreateModalOpen(true);
   };
 
-  const handleEditClass = (e) => {
+  const handleCreateClass = async (e) => {
     e.preventDefault();
-    setClasses(classes.map(c => c.classId === selectedClass.classId ? { ...c, ...formData } : c));
-    setIsEditModalOpen(false);
-    alert('Cập nhật lớp học thành công!');
+    try {
+      await classService.createClass({
+        tenLop: formData.tenLop,
+        maHocKy: parseInt(formData.maHocKy),
+        ngayBatDau: formData.ngayBatDau || null,
+        ngayKetThuc: formData.ngayKetThuc || null,
+        thoiGianHoc: formData.thoiGianHoc || null
+      });
+      alert('Tạo lớp học thành công!');
+      setIsCreateModalOpen(false);
+      fetchData();
+    } catch (error) {
+      alert(error.response?.data?.thongBao || 'Lỗi khi tạo lớp học');
+    }
   };
 
-  const handleDeleteClass = (classId) => {
-    if (window.confirm('Bạn có chắc muốn xóa lớp học này?')) {
-      setClasses(classes.filter(c => c.classId !== classId));
+  const handleOpenEdit = (cls) => {
+    setSelectedClass(cls);
+    setFormData({
+      tenLop: cls.tenLop, 
+      maHocKy: cls.maHocKy, 
+      ngayBatDau: cls.ngayBatDau ? cls.ngayBatDau.split('T')[0] : '', 
+      ngayKetThuc: cls.ngayKetThuc ? cls.ngayKetThuc.split('T')[0] : '',
+      thoiGianHoc: cls.thoiGianHoc || ''
+    });
+    setIsEditModalOpen(true);
+  };
+
+  const handleEditClass = async (e) => {
+    e.preventDefault();
+    try {
+      await classService.updateClass(selectedClass.maLop, {
+        tenLop: formData.tenLop,
+        maHocKy: parseInt(formData.maHocKy),
+        ngayBatDau: formData.ngayBatDau || null,
+        ngayKetThuc: formData.ngayKetThuc || null,
+        thoiGianHoc: formData.thoiGianHoc || null
+      });
+      alert('Cập nhật lớp học thành công!');
+      setIsEditModalOpen(false);
+      fetchData();
+    } catch (error) {
+      alert(error.response?.data?.thongBao || 'Lỗi khi cập nhật lớp học');
+    }
+  };
+
+  const handleDeleteClass = async (classId) => {
+    if (window.confirm('Bạn có chắc muốn xóa lớp học này? Dữ liệu không thể khôi phục.')) {
+      try {
+        await classService.deleteClass(classId);
+        alert('Xóa lớp học thành công!');
+        fetchData();
+      } catch (error) {
+        alert(error.response?.data?.thongBao || 'Lỗi khi xóa lớp học. Lớp học có thể đã có sinh viên hoặc nhóm.');
+      }
     }
   };
 
@@ -113,41 +135,45 @@ const ManageClasses = () => {
     setIsDetailModalOpen(true);
   };
 
-  const handleOpenEdit = (cls) => {
-    setSelectedClass(cls);
-    setFormData({
-      className: cls.className, classCode: cls.classCode, semester: cls.semester,
-      startDate: cls.startDate, endDate: cls.endDate
-    });
-    setIsEditModalOpen(true);
-  };
-
   const handleCopyCode = (code) => {
     navigator.clipboard.writeText(code);
     alert(`Đã sao chép mã lớp: ${code}`);
   };
 
-  const handleRemoveStudent = (studentId) => {
-    if (window.confirm('Xóa sinh viên khỏi lớp?')) {
-      alert('Đã xóa sinh viên khỏi lớp!');
+  const handleRemoveStudent = async (studentId) => {
+    if (window.confirm('Bạn có chắc chắn muốn xóa sinh viên này khỏi lớp?')) {
+      try {
+        await classService.removeStudentFromClass(selectedClass.maLop, studentId);
+        alert('Đã xóa sinh viên khỏi lớp!');
+        
+        // Cập nhật UI ngay lập tức
+        const updatedStudents = selectedClass.danhSachSinhVien.filter(sv => sv.maNguoiDung !== studentId);
+        const updatedClass = { ...selectedClass, danhSachSinhVien: updatedStudents, soSinhVien: updatedStudents.length };
+        setSelectedClass(updatedClass);
+        setClasses(classes.map(c => c.maLop === updatedClass.maLop ? updatedClass : c));
+      } catch (error) {
+        alert(error.response?.data?.thongBao || 'Lỗi khi xóa sinh viên khỏi lớp');
+      }
     }
   };
 
   // Filter
   const filteredClasses = classes.filter(c => {
-    const matchSearch = c.className.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      c.classCode.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchSemester = filterSemester === 'all' || c.semester === filterSemester;
+    const matchSearch = (c.tenLop || '').toLowerCase().includes((searchTerm || '').toLowerCase()) ||
+      (c.maLopHoc || '').toLowerCase().includes((searchTerm || '').toLowerCase());
+    const matchSemester = filterSemester === 'all' || (c.maHocKy || '').toString() === filterSemester;
     return matchSearch && matchSemester;
   });
 
   // Stats
   const totalClasses = classes.length;
-  const activeClasses = classes.filter(c => c.status === 'active').length;
-  const totalStudents = classes.reduce((sum, c) => sum + c.studentCount, 0);
-  const totalGroups = classes.reduce((sum, c) => sum + c.groupCount, 0);
+  const activeClasses = classes.filter(c => c.trangThai === 'active').length;
+  const totalStudents = classes.reduce((sum, c) => sum + c.soSinhVien, 0);
+  const totalGroups = classes.reduce((sum, c) => sum + c.soNhom, 0);
 
-  const semesters = [...new Set(classes.map(c => c.semester))];
+  if (isLoading) {
+    return <div className="loading-state">Đang tải dữ liệu...</div>;
+  }
 
   return (
     <div className="manage-classes-container">
@@ -157,7 +183,7 @@ const ManageClasses = () => {
           <h2 className="page-title">Quản lý Lớp học</h2>
           <p className="page-subtitle">Tạo và quản lý các lớp học phần do bạn phụ trách</p>
         </div>
-        <button className="btn-primary" onClick={() => setIsCreateModalOpen(true)}>
+        <button className="btn-primary" onClick={handleOpenCreate}>
           <FaPlus /> Tạo lớp mới
         </button>
       </div>
@@ -199,13 +225,13 @@ const ManageClasses = () => {
         <div className="search-box">
           <FaSearch className="search-icon" />
           <input
-            type="text" placeholder="Tìm kiếm lớp học..."
+            type="text" placeholder="Tìm kiếm lớp học hoặc mã lớp..."
             value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
         <select className="filter-select" value={filterSemester} onChange={(e) => setFilterSemester(e.target.value)}>
           <option value="all">Tất cả học kỳ</option>
-          {semesters.map(s => <option key={s} value={s}>{s}</option>)}
+          {semesters.map(s => <option key={s.maHocKy} value={s.maHocKy}>{s.tenHocKy}</option>)}
         </select>
       </div>
 
@@ -220,7 +246,7 @@ const ManageClasses = () => {
           <table className="data-table">
             <thead>
               <tr>
-                <th>Mã lớp</th>
+                <th>Mã tham gia</th>
                 <th>Tên môn học</th>
                 <th>Học kỳ</th>
                 <th>Sinh viên</th>
@@ -231,22 +257,22 @@ const ManageClasses = () => {
             </thead>
             <tbody>
               {filteredClasses.map(cls => (
-                <tr key={cls.classId}>
-                  <td><span className="class-code-tag">{cls.classCode}</span></td>
-                  <td><strong>{cls.className}</strong></td>
-                  <td>{cls.semester}</td>
-                  <td>{cls.studentCount}</td>
-                  <td>{cls.groupCount}</td>
+                <tr key={cls.maLop}>
+                  <td><span className="class-code-tag" title="Nhấn để sao chép" onClick={() => handleCopyCode(cls.maLopHoc)} style={{cursor: 'pointer'}}>{cls.maLopHoc}</span></td>
+                  <td><strong>{cls.tenLop}</strong></td>
+                  <td>{cls.tenHocKy}</td>
+                  <td>{cls.soSinhVien}</td>
+                  <td>{cls.soNhom}</td>
                   <td>
-                    <span className={`badge ${cls.status === 'active' ? 'badge-active' : 'badge-ended'}`}>
-                      {cls.status === 'active' ? 'Đang hoạt động' : 'Đã kết thúc'}
+                    <span className={`badge ${cls.trangThai === 'active' ? 'badge-active' : 'badge-ended'}`}>
+                      {cls.trangThai === 'active' ? 'Đang hoạt động' : 'Đã kết thúc'}
                     </span>
                   </td>
                   <td>
                     <div className="actions-cell">
                       <button className="action-btn view" title="Xem chi tiết" onClick={() => handleViewDetail(cls)}><FaEye /></button>
                       <button className="action-btn edit" title="Chỉnh sửa" onClick={() => handleOpenEdit(cls)}><FaEdit /></button>
-                      <button className="action-btn delete" title="Xóa" onClick={() => handleDeleteClass(cls.classId)}><FaTrash /></button>
+                      <button className="action-btn delete" title="Xóa" onClick={() => handleDeleteClass(cls.maLop)}><FaTrash /></button>
                     </div>
                   </td>
                 </tr>
@@ -267,29 +293,29 @@ const ManageClasses = () => {
             <form onSubmit={handleCreateClass}>
               <div className="modal-body">
                 <div className="form-grid">
-                  <div className="form-group">
-                    <label>Mã lớp học *</label>
-                    <input type="text" name="classCode" value={formData.classCode} onChange={handleFormChange} placeholder="VD: LTW01" required />
-                  </div>
-                  <div className="form-group">
+                  <div className="form-group" style={{ gridColumn: 'span 2' }}>
                     <label>Tên môn học *</label>
-                    <input type="text" name="className" value={formData.className} onChange={handleFormChange} placeholder="VD: Lập trình Web" required />
+                    <input type="text" name="tenLop" value={formData.tenLop} onChange={handleFormChange} placeholder="VD: Lập trình Web" required />
                   </div>
                   <div className="form-group">
                     <label>Học kỳ *</label>
-                    <select name="semester" value={formData.semester} onChange={handleFormChange}>
-                      <option value="HK2 2025-2026">HK2 2025-2026</option>
-                      <option value="HK1 2025-2026">HK1 2025-2026</option>
-                      <option value="HK1 2026-2027">HK1 2026-2027</option>
+                    <select name="maHocKy" value={formData.maHocKy} onChange={handleFormChange} required>
+                      {semesters.map(s => (
+                        <option key={s.maHocKy} value={s.maHocKy}>{s.tenHocKy}</option>
+                      ))}
                     </select>
                   </div>
                   <div className="form-group">
-                    <label>Ngày bắt đầu *</label>
-                    <input type="date" name="startDate" value={formData.startDate} onChange={handleFormChange} required />
+                    <label>Thời gian học</label>
+                    <input type="text" name="thoiGianHoc" value={formData.thoiGianHoc} onChange={handleFormChange} placeholder="VD: Thứ 2, Tiết 1-3" />
                   </div>
                   <div className="form-group">
-                    <label>Ngày kết thúc *</label>
-                    <input type="date" name="endDate" value={formData.endDate} onChange={handleFormChange} required />
+                    <label>Ngày bắt đầu</label>
+                    <input type="date" name="ngayBatDau" value={formData.ngayBatDau} onChange={handleFormChange} />
+                  </div>
+                  <div className="form-group">
+                    <label>Ngày kết thúc</label>
+                    <input type="date" name="ngayKetThuc" value={formData.ngayKetThuc} onChange={handleFormChange} />
                   </div>
                 </div>
               </div>
@@ -313,29 +339,29 @@ const ManageClasses = () => {
             <form onSubmit={handleEditClass}>
               <div className="modal-body">
                 <div className="form-grid">
-                  <div className="form-group">
-                    <label>Mã lớp học</label>
-                    <input type="text" name="classCode" value={formData.classCode} onChange={handleFormChange} required />
+                  <div className="form-group" style={{ gridColumn: 'span 2' }}>
+                    <label>Tên môn học *</label>
+                    <input type="text" name="tenLop" value={formData.tenLop} onChange={handleFormChange} required />
                   </div>
                   <div className="form-group">
-                    <label>Tên môn học</label>
-                    <input type="text" name="className" value={formData.className} onChange={handleFormChange} required />
-                  </div>
-                  <div className="form-group">
-                    <label>Học kỳ</label>
-                    <select name="semester" value={formData.semester} onChange={handleFormChange}>
-                      <option value="HK2 2025-2026">HK2 2025-2026</option>
-                      <option value="HK1 2025-2026">HK1 2025-2026</option>
-                      <option value="HK1 2026-2027">HK1 2026-2027</option>
+                    <label>Học kỳ *</label>
+                    <select name="maHocKy" value={formData.maHocKy} onChange={handleFormChange} required>
+                      {semesters.map(s => (
+                        <option key={s.maHocKy} value={s.maHocKy}>{s.tenHocKy}</option>
+                      ))}
                     </select>
                   </div>
                   <div className="form-group">
+                    <label>Thời gian học</label>
+                    <input type="text" name="thoiGianHoc" value={formData.thoiGianHoc} onChange={handleFormChange} />
+                  </div>
+                  <div className="form-group">
                     <label>Ngày bắt đầu</label>
-                    <input type="date" name="startDate" value={formData.startDate} onChange={handleFormChange} required />
+                    <input type="date" name="ngayBatDau" value={formData.ngayBatDau} onChange={handleFormChange} />
                   </div>
                   <div className="form-group">
                     <label>Ngày kết thúc</label>
-                    <input type="date" name="endDate" value={formData.endDate} onChange={handleFormChange} required />
+                    <input type="date" name="ngayKetThuc" value={formData.ngayKetThuc} onChange={handleFormChange} />
                   </div>
                 </div>
               </div>
@@ -358,46 +384,56 @@ const ManageClasses = () => {
             </div>
             <div className="modal-body">
               <div className="class-detail-header">
-                <div className="class-code-display" title="Nhấn để sao chép" onClick={() => handleCopyCode(selectedClass.classCode)} style={{ cursor: 'pointer' }}>
-                  <FaCopy style={{ marginRight: 8, fontSize: 14 }} />{selectedClass.classCode}
+                <div className="class-code-display" title="Nhấn để sao chép" onClick={() => handleCopyCode(selectedClass.maLopHoc)} style={{ cursor: 'pointer' }}>
+                  <FaCopy style={{ marginRight: 8, fontSize: 14 }} />{selectedClass.maLopHoc}
                 </div>
                 <div className="class-info">
-                  <h4>{selectedClass.className}</h4>
-                  <p>{selectedClass.semester} &nbsp;|&nbsp; {selectedClass.startDate} → {selectedClass.endDate}</p>
+                  <h4>{selectedClass.tenLop}</h4>
+                  <p>{selectedClass.tenHocKy} &nbsp;|&nbsp; {selectedClass.ngayBatDau || '--'} → {selectedClass.ngayKetThuc || '--'}</p>
                 </div>
               </div>
 
-              <h4 style={{ marginBottom: 12, color: '#152259' }}>Danh sách sinh viên ({(mockStudents[selectedClass.classId] || []).length})</h4>
+              <h4 style={{ marginBottom: 12, color: '#152259' }}>Danh sách sinh viên ({selectedClass.danhSachSinhVien?.length || 0})</h4>
 
-              {(mockStudents[selectedClass.classId] || []).length === 0 ? (
+              {(!selectedClass.danhSachSinhVien || selectedClass.danhSachSinhVien.length === 0) ? (
                 <div className="empty-state">
                   <p>Chưa có sinh viên trong lớp này</p>
                 </div>
               ) : (
-                <table className="student-table">
-                  <thead>
-                    <tr>
-                      <th>STT</th>
-                      <th>MSSV</th>
-                      <th>Họ và tên</th>
-                      <th>Nhóm</th>
-                      <th>Thao tác</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {(mockStudents[selectedClass.classId] || []).map((sv, idx) => (
-                      <tr key={sv.userId}>
-                        <td>{idx + 1}</td>
-                        <td><strong>{sv.userCode}</strong></td>
-                        <td>{sv.fullName}</td>
-                        <td>{sv.groupName}</td>
-                        <td>
-                          <button className="btn-sm danger" onClick={() => handleRemoveStudent(sv.userId)}>Xóa</button>
-                        </td>
+                <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                  <table className="student-table">
+                    <thead>
+                      <tr>
+                        <th>STT</th>
+                        <th>MSSV</th>
+                        <th>Họ và tên</th>
+                        <th>Lớp SV</th>
+                        <th>Nhóm</th>
+                        <th>Thao tác</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {selectedClass.danhSachSinhVien.map((sv, idx) => (
+                        <tr key={sv.maNguoiDung}>
+                          <td>{idx + 1}</td>
+                          <td><strong>{sv.maSo}</strong></td>
+                          <td>{sv.hoTen} {sv.laNhomTruong && <span style={{color: 'orange', fontSize: 12}}>(Nhóm trưởng)</span>}</td>
+                          <td>{sv.lopSinhVien}</td>
+                          <td>
+                            {sv.tenNhom ? (
+                              <span style={{color: 'green'}}>{sv.tenNhom}</span>
+                            ) : (
+                              <span style={{color: 'gray'}}>Chưa có nhóm</span>
+                            )}
+                          </td>
+                          <td>
+                            <button className="btn-sm danger" onClick={() => handleRemoveStudent(sv.maNguoiDung)}>Xóa</button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               )}
             </div>
             <div className="modal-footer">
