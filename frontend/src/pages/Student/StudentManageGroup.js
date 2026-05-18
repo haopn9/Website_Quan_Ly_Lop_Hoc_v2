@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaTimes, FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import './StudentManageGroup.css';
-import deTaiService from '../../services/detaiService';
+import deTaiService from '../../services/deTaiService';
 import authService from '../../services/authService';
 import nhiemVuService from '../../services/nhiemVuService';
 import apiClient from '../../services/apiClient';
