@@ -41,6 +41,12 @@ const classService = {
   removeStudentFromClass: async (maLop, maSinhVien) => {
     const response = await apiClient.delete(`/api/lophoc/${maLop}/sinhvien/${maSinhVien}`);
     return response.data || response;
+  },
+
+  // Lấy danh sách sinh viên chưa có nhóm
+  getUnassignedStudents: async (maLop) => {
+    const response = await apiClient.get(`/api/lophoc/${maLop}/sinhvien-chua-co-nhom`);
+    return response.data || response;
   }
 };
 
