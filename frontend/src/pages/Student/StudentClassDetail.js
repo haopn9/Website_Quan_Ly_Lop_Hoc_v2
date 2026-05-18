@@ -11,7 +11,7 @@ import {
 } from 'react-icons/fa';
 import './StudentClassDetail.css';
 import classService from '../../services/classService';
-import deTaiService from '../../services/detaiService';
+import deTaiService from '../../services/deTaiService';
 import authService from '../../services/authService';
 
 
